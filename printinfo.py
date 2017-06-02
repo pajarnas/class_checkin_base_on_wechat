@@ -30,10 +30,16 @@ class PrtInfo():
             return 'please upload your proof'
         if id == 6:
             return 'please input your check in type (Auto/Random)'
+        if id == 7:
+            return 'please enter the seq id of check in detail file'
+        if id == 8:
+            return 'please confirm the leave result (Y/n)'
 
 
     @staticmethod
     def successMessage(id):
+        if id == 0:
+            return 'Student checkin Result updated Successfully ,new record : '
         if id == 1:
             return 'Student Records initialization Successful'
         if id == 2:

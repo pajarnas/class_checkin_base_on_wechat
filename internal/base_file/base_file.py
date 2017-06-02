@@ -4,13 +4,13 @@ class BaseFile():
     def __init__(self,name):
         self.name = name
 
-
-    def write_file(self, data, way='wb'):
+    def write_file(self, data,way='wb'):
         try:
             with open(self.name, way) as csv_file:
                 FIEDLS = self.columns
                 writer = csv.DictWriter(csv_file, fieldnames=FIEDLS)
-                writer.writerow(dict(zip(FIEDLS, FIEDLS)))
+                if way == 'wb':
+                    writer.writerow(dict(zip(FIEDLS, FIEDLS)))
                 for line in data:
                     writer.writerow(line)
                 csv_file.close()

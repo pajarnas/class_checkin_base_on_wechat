@@ -10,7 +10,6 @@ class AutoCheckin (Checkin):
 
     def __init__(self,wechat_id):
         Checkin.__init__(self,wechat_id)
-        self.detail_records = self.initDetailRecords()
         self.class_list = self.initClassList()
         self.random_list = []
         self.section_id = self.initSectionId(time.strftime('%H%M'))
@@ -203,13 +202,6 @@ class AutoCheckin (Checkin):
 
     def exitCheckin(self):
         pass
-
-
-
-
-
-
-
 
 if __name__ == '__main__':
     c = AutoCheckin('wonka80')#创建对象,完成考勤对象依赖的初始化

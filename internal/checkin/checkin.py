@@ -16,6 +16,7 @@ class Checkin():
     coures_file = CourseFile('../courseInfo.csv')
     teacher_file = TeacherFile('../teacherInfo.csv')
 
+
     # 当边界类确定系统时间是合法的时候 才能创建自动考勤对象
     def __init__(self,wechat_id):
         self.wechat_id = wechat_id
@@ -74,26 +75,6 @@ class Checkin():
             else:
                 return crs_id
 
-    def initSumRecords(self):
-        temp_list = []
-        if os.path.exists(self.sum_file.name):
-            sum_records = BaseFile.read_file(self.sum_file.name)
-            for sum_rec in sum_records:
-                    temp_list.append(sum_rec)
-            print PrtInfo.successMessage(2)
-            return temp_list
-        else:
-            temp_dict = {}
-            for stu_rec in self.student_records:
-                temp_dict['StuID'] = stu_rec['StuID']
-                temp_list.append(temp_dict)
-            print PrtInfo.successMessage(2)
-            return temp_dict
-
-    @abstractmethod
-    def initDetailRecords(self):
-        return []
-
     def initStudentRecords(self):
         stu_records = BaseFile.read_file(Checkin.student_file.name)
         csr_records = BaseFile.read_file(Checkin.coures_file.name)
@@ -108,45 +89,63 @@ class Checkin():
         print PrtInfo.successMessage(1)
         return temp_list
 
-    def insertNewSeqRecord(self):
-        seq_records = self.seq_file.read_file(self.seq_file.name)
-        seq_records.append({'TeacherID':self.tea_id,
+    # 增加seq记录到seq file 文件
+    def addSeqId(self,seq_id):
+        seq_rec = {'TeacherID':self.tea_id,
                             'CourseID':self.crs_id,
-                            'SeqID':str(int(self.seq_id)),
+                            'SeqID':str(int(seq_id)),
                             'Time':time.strftime('%Y-%m-%d %H:%M:%S')
-                            })
-        self.seq_file.write_file(seq_records)
+                            }
+        self.seq_file.write_file(data=[dict(seq_rec)],way='ab')
+
+    # 初始化当前的考勤的 Sum 文件
+    # def initSumFile(self):
+    #     sum_file = SumFile(self.sum_name)
+    #     sum_file.columns = ['StuID']
+    #     for i in range(1, int(self.seq_id) + 1):
+    #         sum_file.columns.append('checkin' + str(i))
+    #     return sum_file
 
     def initSumFile(self):
-        sum_file = SumFile(self.initSumName())
+        sum_file = SumFile(self.initSumName(self.tea_id,self.crs_id))
         sum_file.columns = ['StuID']
         for i in range(1, int(self.seq_id) + 1):
             sum_file.columns.append('checkin' + str(i))
         return sum_file
 
-    def insertSumRecord(self,sum_records,detail_records,checkin_id):
-        for detail_rec in detail_records:
-            for sum_rec in sum_records:
-                if sum_rec['StuID'] == detail_rec['StuID']:
-                    sum_rec['checkin'+str(checkin_id)] = detail_rec['checkinResult']
-
+    # 大更新 不需要参数 自动完成所有相关detail的更新
     def updateSum(self):
-        self.sum_records = []
-        for stu_rec in self.student_records:
-            sum_rec_dict = {'StuID':stu_rec['StuID']}
-            self.sum_file.columns = ['StuID']
+        sum_records = []
+        for stu_rec in self.initStudentRecords():
+            sum_rec_dict = {'StuID': stu_rec['StuID']}
             for i in range(1, int(self.seq_id) + 1):
-                sum_rec_dict.update({'checkin'+str(i):'None'})
-                self.sum_file.columns.append('checkin'+str(i))
-            self.sum_records.append(sum_rec_dict)
-        for i in range(1,int(self.seq_id) + 1):
-            detail_list = BaseFile.read_file('_'.join([str(self.tea_id),str(self.crs_id),str(i)])+'_checkinDetail.csv')
-            self.insertSumRecord(self.sum_records,detail_list,i)
+                sum_rec_dict.update({'checkin' + str(i): 'None'})
+            sum_records.append(sum_rec_dict)
+        for i in range(1, int(self.seq_id) + 1):
+            detail_records = BaseFile.read_file(self.initDetailName(self.tea_id,self.crs_id,self.seq_id))
+            for detail_rec in detail_records:
+                for sum_rec in sum_records:
+                    if sum_rec['StuID'] == detail_rec['StuID']:
+                        sum_rec['checkin' + str(i)] = detail_rec['checkinResult']
+        self.initSumFile().write_file(sum_records)
 
-    def createDetailFiles(self):
-        self.detail_file.write_file(self.detail_records)
-        print PrtInfo.successMessage(4)
-
-    def createSumFiles(self):
-        self.updateSum()
-        self.sum_file.write_file(self.sum_records)
+    # 小更新 只会更新其中一列, 更新哪一列 需要指定seq_id
+    # 完成后, 小更新一次.只更新最新的次序号,
+    # 先生成考勤结果列表, 从detail文件中读取, 最后一次的,
+    # 考勤结果, 与学号, 写入文件中, 最终生成一个列表, 然后将列表传入小更新函数
+    # 小更新([{考勤结果, 考勤学生学号}], 次序号), 遍历文件, 如果学号和列表中的某一个相同,
+    # 更新.捕获异常, 文件遍历完却在列表中找不到该学生, 和学号中存在
+    # 但是文件中不存在的异常
+    def updateSumByCertaiSeqId(self,seq_id):
+        result_records = []
+        detail_records = BaseFile.read_file(self.initDetailName(self.tea_id,self.crs_id,seq_id))
+        for rec in detail_records:
+            temp_dict = {'StuID': rec['StuID'], 'checkin'+str(seq_id): rec['checkinResult']}
+            result_records.append(temp_dict)
+        sum_records = SumFile.read_file(self.initSumName(self.tea_id,self.crs_id))
+        for s_rec in sum_records:
+            for r_rec in result_records:
+                if s_rec['StuID'] == r_rec['StuID']:
+                    s_rec.update(r_rec)
+        sum_file = self.initSumFile()
+        sum_file.write_file(sum_records)
