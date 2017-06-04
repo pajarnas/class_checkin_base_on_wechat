@@ -6,8 +6,10 @@ import re,time
 class ReadIni() :
 
     class_time_list = []  # 设置一个列表存两节课的开始和结束时间
+    begin_time_list = []
     def __init__(self):
         self.class_time_list = self.readIni(self.class_time_list)
+        self.begin_time_list = self.readBegin(self.begin_time_list)
 
     def readIni(self,class_time_list ):
         cf = ConfigParser.ConfigParser()
@@ -37,6 +39,36 @@ class ReadIni() :
                      'EndTime': str(time[2]) + str(time[3])}
         class_time_list.append(time_dict)
         return class_time_list
+
+    def readBegin(self,class_time_list ):
+        cf = ConfigParser.ConfigParser()
+        cf.read('../settings.ini')
+
+        time = re.split('-|:', cf.get('sectime', 'sec1'))
+        time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
+                     'EndTime': str(time[2])+':' + str(time[3]) }
+        class_time_list.append(time_dict)
+
+        time = re.split('-|:', cf.get('sectime', 'sec2'))
+        time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
+                     'EndTime': str(time[2]) +':'+ str(time[3]) }
+        class_time_list.append(time_dict)
+        # 第三四节课的时间始末
+        time = re.split('-|:', cf.get('sectime', 'sec3'))
+        time_dict = {'StartTime': str(time[0]) +':'+ str(time[1]),
+                     'EndTime': str(time[2])+':' + str(time[3])}
+        class_time_list.append(time_dict)
+        time = re.split('-|:', cf.get('sectime', 'sec4'))
+        time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
+                     'EndTime': str(time[2])+':' + str(time[3])}
+        class_time_list.append(time_dict)
+        # 第四五节课的时间始末
+        time = re.split('-|:', cf.get('sectime', 'sec5'))
+        time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
+                     'EndTime': str(time[2])+':' + str(time[3])}
+        class_time_list.append(time_dict)
+        return class_time_list
+
 if __name__ == '__main__':
     def initSectionId(nowtime):
         t = ReadIni()
@@ -48,4 +80,7 @@ if __name__ == '__main__':
                 return i + 1
         else:
             return 0
-    print initSectionId('1030')
+    for i in range(0,5,1):
+        h,m = ReadIni().begin_time_list[i]['StartTime'].split(':')
+        print h
+        print m

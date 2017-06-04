@@ -54,6 +54,8 @@ class Checkin():
                 tea_id = record['TeacherID']
         return tea_id
 
+
+
     @staticmethod
     # 通过终端确定某一个教师对应的所有课程号中哪一个
     def initCourseIdByWechatid(wechat_id):
@@ -115,6 +117,8 @@ class Checkin():
 
     # 大更新 不需要参数 自动完成所有相关detail的更新
     def updateSum(self):
+        if not self.isSumExist():
+            return
         sum_records = []
         for stu_rec in self.initStudentRecords():
             sum_rec_dict = {'StuID': stu_rec['StuID']}
@@ -136,7 +140,21 @@ class Checkin():
     # 小更新([{考勤结果, 考勤学生学号}], 次序号), 遍历文件, 如果学号和列表中的某一个相同,
     # 更新.捕获异常, 文件遍历完却在列表中找不到该学生, 和学号中存在
     # 但是文件中不存在的异常
+    def isSumExist(self):
+        temp_list = []
+        if not os.path.exists(self.initSumName(self.tea_id,self.crs_id)):
+            temp_dict = {}
+            for stu_rec in self.initStudentRecords():
+                temp_dict['StuID'] = stu_rec['StuID']
+                temp_list.append(temp_dict)
+            SumFile(self.initSumName(self.tea_id,self.crs_id)).write_file(temp_list)
+            print PrtInfo.successMessage(2)
+            return False
+        else:
+            return True
     def updateSumByCertaiSeqId(self,seq_id):
+        if not self.isSumExist():
+            return
         result_records = []
         detail_records = BaseFile.read_file(self.initDetailName(self.tea_id,self.crs_id,seq_id))
         for rec in detail_records:
@@ -149,3 +167,7 @@ class Checkin():
                     s_rec.update(r_rec)
         sum_file = self.initSumFile()
         sum_file.write_file(sum_records)
+
+    def createDetailFile(self,detail_records):
+        DetailFile(self.initDetailName(self.tea_id,self.crs_id,self.seq_id)).write_file(detail_records)
+        print PrtInfo.successMessage(4)

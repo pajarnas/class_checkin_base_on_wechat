@@ -26,9 +26,7 @@ class ManCheckin (Checkin):
         print PrtInfo.notFoundMessage(3)
         return False
 
-    def createDetailFiles(self,detail_records):
-        DetailFile(self.initDetailName(self.tea_id,self.crs_id,self.seq_id)).write_file(detail_records)
-        print PrtInfo.successMessage(4)
+
 
     def initDetailRecords(self):
         stu_records = BaseFile.read_file(Checkin.student_file.name)
@@ -46,13 +44,14 @@ class ManCheckin (Checkin):
         return temp_list
 
 if __name__ == '__main__':
+    # 教师开启手工考勤的用例描述:
     c= ManCheckin('wonka80')#创建对象,完成考勤对象依赖的初始化
     c.addSeqId(c.seq_id) # 在seq文件中保存此次seq id 记录
-    c.createDetailFiles(c.initDetailRecords())  # 创建空的文件 detail和 sumfile
-    c.updateSum()
-    stu_id = 201416920101
+    c.createDetailFile([])  # 创建空的文件 detail和 sumfile
+    # c.updateSum()
+    # stu_id = 201416920101
     seq_id = c.seq_id
-    c.updateStuDetailCheckinResult(stu_id,seq_id)
+    # c.updateStuDetailCheckinResult(stu_id,seq_id)
     stu_id = 201416920102
     c.updateStuDetailCheckinResult(stu_id, seq_id)
     c.updateSumByCertaiSeqId(seq_id)

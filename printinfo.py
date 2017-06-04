@@ -33,7 +33,7 @@ class PrtInfo():
         if id == 7:
             return 'please enter the seq id of check in detail file'
         if id == 8:
-            return 'please confirm the leave result (Y/n)'
+            return 'please confirm the leave result (y/n)'
 
 
     @staticmethod
@@ -77,5 +77,6 @@ class PrtInfo():
     def tipsMessage(id):
         if id == 0:
             return 'the check in list is empty!'
+
 
 
