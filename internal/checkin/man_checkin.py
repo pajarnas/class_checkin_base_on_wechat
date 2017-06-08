@@ -1,16 +1,17 @@
 #encoding=utf-8
 from internal.base_file.base_file import BaseFile,DetailFile,SumFile
-from checkin import Checkin
+from base_checkin import BaseCheckin
 from printinfo import PrtInfo
 import os,time
-class ManCheckin (Checkin):
-
-    def __init__(self,wechat_id):
-        Checkin.__init__(self,wechat_id)
 
 
-    def updateStuDetailCheckinResult(self,stu_id,seq_id):
-        detail_records = BaseFile.read_file(self.initDetailName(self.tea_id,self.crs_id,seq_id))
+class ManCheckin (BaseCheckin):
+
+    def __init__(self, wechat_id):
+        BaseCheckin.__init__(self,wechat_id)
+
+    def update_stu_detail_checkin_result(self, stu_id, seq_id):
+        detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id, self.crs_id, seq_id))
         for detail_rec in detail_records:
             if detail_rec['StuID'] == str(stu_id):
                 if detail_rec['checkinResult'] == '请假提交':
@@ -20,16 +21,30 @@ class ManCheckin (Checkin):
                         detail_rec['checkinResult'] = '缺勤'
                 detail_rec['checkinResult'] = raw_input(PrtInfo.promptMessage(4))
                 print PrtInfo.successMessage(0)+detail_rec['checkinResult']
-                detail_file = DetailFile(self.initDetailName(self.tea_id,self.crs_id,self.seq_id))
+                detail_file = DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id))
                 detail_file.write_file(detail_records)
                 return True
         print PrtInfo.notFoundMessage(3)
         return False
 
+    @staticmethod
+    def confirm_leave(detail_file):
+        records = BaseFile.read_file(detail_file.name)
+        leave_list = []
+        for rec in records:
+            if rec['checkinResult'] is '假条提交':
+                leave_list.append(rec)
+        if leave_list is not []:
+            print 'You have ' + str(leave_list.__len__()) + ' leave events to handle!'
+            for line in leave_list:
+                if raw_input(PrtInfo.promptMessage(8)) == 'y':
+                    line['checkinResult'] = '请假'
+                else:
+                    line['checkinResult'] = '缺勤'
+                detail_file.write_file([line], 'ab')
 
-
-    def initDetailRecords(self):
-        stu_records = BaseFile.read_file(Checkin.student_file.name)
+    def init_detail_records(self):
+        stu_records = BaseFile.read_file(BaseCheckin.student_file.name)
         temp_list = []
         for stu_rec in stu_records:
             temp_dict = {'StuID': stu_rec['StuID'],

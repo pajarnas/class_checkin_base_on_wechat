@@ -1,2 +1,3 @@
-import time
-a = time.strftime('%Y-%m-%d %H:%M:%S')
+l = []
+if all(l):
+    print 1

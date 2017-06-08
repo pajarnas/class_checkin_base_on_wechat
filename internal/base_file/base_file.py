@@ -1,6 +1,9 @@
 import csv
-class BaseFile():
+
+
+class BaseFile:
     columns = []
+
     def __init__(self,name):
         self.name = name
 
@@ -36,31 +39,42 @@ class BaseFile():
 
 class SeqFile(BaseFile):
     columns = ['TeacherID','CourseID','SeqID','Time']
-    def __init__(self,name='../seq.csv'):
-        BaseFile.__init__(self,name)
+
+    def __init__(self, name='../seq.csv'):
+        BaseFile.__init__(self, name)
+
 
 class DetailFile(BaseFile):
     columns = ['StuID','checkinTime','ProofPath','checkinType','IsSuc','checkinResult']
+
     def __init__(self,name):
         BaseFile.__init__(self,name)
+
 
 class SumFile(BaseFile):
     columns =['StuID']
+
     def __init__(self,name):
         BaseFile.__init__(self,name)
 
+
 class StudentFile(BaseFile):
     columns = ['StuID', 'StuName', 'ClassID', 'WeChatID', 'FeaturePath']
+
     def __init__(self,name='../studentInfo.csv'):
         BaseFile.__init__(self,name)
 
+
 class TeacherFile(BaseFile):
     columns = ["TeacherID", "TeacherName", "WeChatID"]
+
     def __init__(self,name='../teacherInfo.csv'):
         BaseFile.__init__(self,name)
 
+
 class CourseFile(BaseFile):
     columns = ['CourseID', 'CourseName', 'TeacherID', 'ClassNums']
+
     def __init__(self,name='../courseInfo.csv'):
         BaseFile.__init__(self,name)
 
