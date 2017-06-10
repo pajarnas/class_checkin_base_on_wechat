@@ -1,11 +1,12 @@
 #encoding=utf-8
 from internal.base_file.base_file import BaseFile,DetailFile,SumFile,CourseFile
 from base_checkin import BaseCheckin
-from subject_observer import Observer
+from man_checkin import ManCheckin
+from subject_observer import EndcheckinObserver,TimeWindowObserver
 from printinfo import PrtInfo
 from my_exceptions import NouFoundException,WrongException
 from __init__ import ReadIni
-from time_window import Timer
+from time_window import TimeWindow
 import time
 import random
 
@@ -17,7 +18,7 @@ class AutoCheckin(BaseCheckin):
         self.class_list = self.init_class_list()
         self.enter_time = time.strftime('%H:%M')
         self.section_id = self.init_section_id(time.strftime('%H:%M'))
-        self.time_window = Timer()
+        self.time_window = TimeWindow()
 
     def init_class_list(self):
             crs_list = CourseFile.read_file(BaseCheckin.course_file.name)
@@ -82,6 +83,7 @@ class AutoCheckin(BaseCheckin):
                         # print PrtInfo.successMessage(6)
                     print 'Kick one OK'
                     checkin_obj.notify()
+
                     BaseCheckin.checkin_list.remove(checkin_obj)
                 # 节次一样,无法进入,退出函数
                 else:
@@ -243,79 +245,63 @@ class AutoCheckin(BaseCheckin):
     def exit_checkin(self):
         pass
 
+    def end_checkin(self):
+        detail_file = DetailFile(self.initDetailName(self.tea_id, self.crs_id, self.seq_id))
+        for stu in self.initStudentRecords():
+            rec = self.getLatestRecord(stu['StuID'],'Auto')
+            # 没有签到的学生 缺勤 追加到文件中
+            if rec == {}:
+                rec = {'StuID': stu['StuID'],
+                       'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
+                       'ProofPath': 'none',
+                       'checkinType': 'Auto',
+                       'IsSuc': 'none',
+                       'checkinResult': '缺勤'}
+                detail_file.write_file([rec], 'ab')
+                continue
 
-class EndcheckinObserver(Observer):
-    def __init__(self,checkin_obj):
-        Observer.__init__(self)
-        self.checkin_obj = checkin_obj
+            # 签到 并且来的学生 检查是否请假
+            if rec['checkinResult'] == '假条提交':
+                rec.update({'checkinResult': '假条提交'})
+                detail_file.write_file([rec], 'ab')
+                continue
 
-    def update(self):
-        print 'i update'
-        # detail_file = DetailFile(self.checkin_obj.initDetailName(self.checkin_obj.tea_id, self.checkin_obj.crs_id, self.checkin_obj.seq_id))
-        # for stu in self.checkin_obj.initStudentRecords():
-        #     rec = self.checkin_obj.getLatestRecord(stu['StuID'],'Auto')
-        #     # 没有签到的学生 缺勤 追加到文件中
-        #     if rec == {}:
-        #         rec = {'StuID': stu['StuID'],
-        #                'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
-        #                'ProofPath': 'none',
-        #                'checkinType': 'Auto',
-        #                'IsSuc': 'none',
-        #                'checkinResult': '缺勤'}
-        #         detail_file.write_file([rec], 'ab')
-        #         continue
-        #
-        #     # 签到 并且来的学生 检查是否请假
-        #     if rec['checkinResult'] == '假条提交':
-        #         rec.update({'checkinResult': '假条提交'})
-        #         detail_file.write_file([rec], 'ab')
-        #         continue
-        #
-        #     # 签到 并且来的学生 检查是否 迟到
-        #     if rec['IsSuc'] == 'True':
-        #         rec2 = self.checkin_obj.getLatestRecord(rec['StuID'],'Random')
-        #         if rec2 is not {} :
-        #             if rec2['IsSuc'] is not 'True':
-        #                 rec.update({'checkinResult': '早退'})
-        #                 detail_file.write_file([rec], 'ab')
-        #                 continue
-        #         rec.update({'checkinResult': self.checkin_obj.isLate(rec)})
-        #         detail_file.write_file([rec], 'ab')
-        #         continue
-        #
-        #     # 签到失败 没来的学生 记录为缺勤或者早退
-        #     if rec['IsSuc'] == 'False':
-        #         rec2 = self.checkin_obj.getLatestRecord(rec['StuID'], 'Random')
-        #         if rec2 is not {}:
-        #             if rec2['IsSuc'] is 'True':
-        #                 rec.update({'checkinResult': '迟到'})
-        #                 detail_file.write_file([rec], 'ab')
-        #                 continue
-        #         rec.update({'checkinResult': '缺勤'})
-        #         detail_file.write_file([rec], 'ab')
-        #         continue
-        # Mancheckin.confirmLeave(detail_file)
-        # self.checkin_obj.updateSum()
+            # 签到 并且来的学生 检查是否 迟到
+            if rec['IsSuc'] == 'True':
+                rec2 = self.getLatestRecord(rec['StuID'],'Random')
+                if rec2 is not {} :
+                    if rec2['IsSuc'] is not 'True':
+                        rec.update({'checkinResult': '早退'})
+                        detail_file.write_file([rec], 'ab')
+                        continue
+                rec.update({'checkinResult': self.isLate(rec)})
+                detail_file.write_file([rec], 'ab')
+                continue
+
+            # 签到失败 没来的学生 记录为缺勤或者早退
+            if rec['IsSuc'] == 'False':
+                rec2 = self.getLatestRecord(rec['StuID'], 'Random')
+                if rec2 is not {}:
+                    if rec2['IsSuc'] is 'True':
+                        rec.update({'checkinResult': '迟到'})
+                        detail_file.write_file([rec], 'ab')
+                        continue
+                rec.update({'checkinResult': '缺勤'})
+                detail_file.write_file([rec], 'ab')
+                continue
+        ManCheckin.confirmLeave(detail_file)
+        self.updateSum()
 
 
-class TimeWindowObserver(Observer):
-    def __init__(self,checkin_obj):
-        Observer.__init__(self)
-        self.checkin_obj = checkin_obj
 
-    def update(self):
-        # 问自己是不是队首
-        print 'checkin obj cancle threading'
-        if self.checkin_obj is BaseCheckin.checkin_list[0]:
-            if self.checkin_obj.time_window.t is not None:
-                self.checkin_obj.time_window.t.cancel()
 
 if __name__ == '__main__':
-    # print checkin.checkin_list
-    # c = Autocheckin('w_101')
-    # c.entryList()
-    # print 'c.section_id:'+ str(c.section_id)
-    # print 'c.enter_time:'+str(c.enter_time)
+    # 时间窗口 测试用例1
+    c = AutoCheckin('w_101')
+    c.attach(EndcheckinObserver(c))
+    c.attach(TimeWindowObserver(c))
+    c.entry_list()
+
 
     # 2
     # c = Autocheckin('w_101')
@@ -343,26 +329,26 @@ if __name__ == '__main__':
     # 正在考勤204, 第2节课, 103
     # 要考勤205(第三个人踢掉队首的代码)
 
-    c = AutoCheckin('w_101')
-    c.enter_time = '9:00'
-    c.section_id = 1
-    c.attach(EndcheckinObserver(c))
-    c.attach(TimeWindowObserver(c))
-    BaseCheckin.checkin_list.append(c)
-
-    e = AutoCheckin('w_102')
-    e.enter_time = '9:05'
-    e.section_id = 1
-    e.attach(EndcheckinObserver(e))
-    e.attach(TimeWindowObserver(e))
-    BaseCheckin.checkin_list.append(e)
-
-    d = AutoCheckin('w_103')
-    d.attach(EndcheckinObserver(d))
-    d.attach(TimeWindowObserver(d))
-    d.enter_time = '10:30'
-    d.entry_list()
+    # c = AutoCheckin('w_101')
+    # c.enter_time = '9:00'
+    # c.section_id = 1
+    # c.attach(EndcheckinObserver(c))
+    # c.attach(TimeWindowObserver(c))
+    # BaseCheckin.checkin_list.append(c)
     #
+    # e = AutoCheckin('w_102')
+    # e.enter_time = '9:05'
+    # e.section_id = 1
+    # e.attach(EndcheckinObserver(e))
+    # e.attach(TimeWindowObserver(e))
+    # BaseCheckin.checkin_list.append(e)
+    #
+    # d = AutoCheckin('w_103')
+    # d.attach(EndcheckinObserver(d))
+    # d.attach(TimeWindowObserver(d))
+    # d.enter_time = '10:30'
+    # d.entry_list()
+    # #
     # 场景5:101
     # 第1节课正在考勤201, 第1节课, 102
     # 正在考勤204, 第2节课, 103
@@ -406,18 +392,6 @@ if __name__ == '__main__':
     #
     # print d.class_list
     # d.entryList()
-
-
-
-
-
-
-
-
-
-
-
-
 
 # c = Autocheckin('wonka80')#创建对象,完成考勤对象依赖的初始化
     # 测试多组用户学生在 1全局队列为空 2 时间窗口为5秒 3 在时间窗口之内提交的数据 通过
