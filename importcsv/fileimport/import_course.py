@@ -4,7 +4,7 @@ import re
 # import sys
 # sys.path.append("..")
 from base_import import BaseImport
-from importcsv.checker.course_check import CourseCheckMixin
+from checkin.importcsv.checker.course_check import CourseCheckMixin
 
 
 class ImportCourseInfo(BaseImport, CourseCheckMixin):

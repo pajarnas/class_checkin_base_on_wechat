@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from base_import import BaseImport
-from importcsv.checker.base_check import BaseCheckMixin
+from checkin.importcsv.checker.base_check import BaseCheckMixin
 
 
 class ImportTeacherInfo(BaseImport, BaseCheckMixin):

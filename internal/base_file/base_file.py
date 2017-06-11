@@ -19,6 +19,7 @@ class BaseFile:
                 csv_file.close()
 
         except IOError:
+
             print "File open error : " + self.name + "\nplease check the filename"
             exit(-1)
 

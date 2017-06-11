@@ -3,7 +3,7 @@
 # import sys
 # sys.path.append("..")
 from base_import import BaseImport
-from importcsv.checker.base_check import BaseCheckMixin
+from checkin.importcsv.checker.base_check import BaseCheckMixin
 
 
 class ImportStudentInfo(BaseImport, BaseCheckMixin):
