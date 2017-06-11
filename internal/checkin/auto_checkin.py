@@ -123,15 +123,29 @@ class AutoCheckin(BaseCheckin):
         if i is 1:
             return 'False'
 
+    def cancel_leave(self, stu_id):
+        dict = {'StuID': stu_id,
+         'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
+         'ProofPath': '',
+         'checkinType': 'Auto',
+         'IsSuc': 'False',
+         'checkinResult': ''}
+        DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id)). \
+            write_file([dict], 'ab')
+        print 'please finish your check in'
+
     def get_detail_record(self, checkin_type, stu_id):
         checkin_result = None
-        if raw_input("enter 'y' to ask for leave") is 'y':
+        if raw_input("enter 'y' to ask for leave") == 'y':
             checkin_result = '假条提交'
-        proof = self.upload_path()
-        judge_result = self.judge_result(proof)
-        if judge_result is not True and checkin_result is None:
-            print "you are not 'here' or you are not 'you'"
-        stu_id = raw_input("enter your student id")
+            print 'the leave permission uploaded'
+            proof = self.upload_path()
+            judge_result = 'True'
+        else:
+            proof = self.upload_path()
+            judge_result = self.judge_result(proof)
+            if judge_result != 'True':
+                 print "you are not 'here' or you are not 'you'"
         return {'StuID': stu_id,
                 'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
                 'ProofPath': proof,
@@ -143,7 +157,7 @@ class AutoCheckin(BaseCheckin):
         detail_rec = {}
         detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id,self.crs_id,self.seq_id))
         for rec in detail_records:
-            if (rec['StuID'] is str(stu_id)) & (rec['checkinType'] is str(checkin_type)):
+            if (rec['StuID'] == str(stu_id)) & (rec['checkinType'] == str(checkin_type)):
                 detail_rec = rec
         return detail_rec
 
@@ -155,7 +169,7 @@ class AutoCheckin(BaseCheckin):
             DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id)). \
                 write_file([self.get_detail_record(checkin_type, stu_id)], 'ab')
             return
-        elif rec['IsSuc'] is not 'True':
+        elif rec['IsSuc'] != 'True':
             DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id)). \
                 write_file([self.get_detail_record(checkin_type, stu_id)], 'ab')
             return
@@ -172,8 +186,7 @@ class AutoCheckin(BaseCheckin):
 
     def join_checkin(self, wechat_id):
         if self in BaseCheckin.checkin_list:
-            checkin_type = 'Auto'
-            # checkin_type = raw_input(PrtInfo.promptMessage(6))
+            checkin_type = raw_input(PrtInfo.promptMessage(6))
             if checkin_type == 'Auto':
                 self.init_new_detail_record(wechat_id,'Auto')
                 PrtInfo.successMessage(8)
@@ -234,9 +247,9 @@ class AutoCheckin(BaseCheckin):
         pass
 
     def end_checkin(self):
-        detail_file = DetailFile(self.initDetailName(self.tea_id, self.crs_id, self.seq_id))
-        for stu in self.initStudentRecords():
-            rec = self.getLatestRecord(stu['StuID'],'Auto')
+        detail_file = DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id))
+        for stu in self.init_student_records():
+            rec = self.get_latest_record(stu['StuID'],'Auto')
             # 没有签到的学生 缺勤 追加到文件中
             if rec == {}:
                 rec = {'StuID': stu['StuID'],
@@ -256,19 +269,19 @@ class AutoCheckin(BaseCheckin):
 
             # 签到 并且来的学生 检查是否 迟到
             if rec['IsSuc'] == 'True':
-                rec2 = self.getLatestRecord(rec['StuID'],'Random')
+                rec2 = self.get_latest_record(rec['StuID'],'Random')
                 if rec2 is not {} :
                     if rec2['IsSuc'] is not 'True':
                         rec.update({'checkinResult': '早退'})
                         detail_file.write_file([rec], 'ab')
                         continue
-                rec.update({'checkinResult': self.isLate(rec)})
+                rec.update({'checkinResult': self.is_late(rec)})
                 detail_file.write_file([rec], 'ab')
                 continue
 
             # 签到失败 没来的学生 记录为缺勤或者早退
             if rec['IsSuc'] == 'False':
-                rec2 = self.getLatestRecord(rec['StuID'], 'Random')
+                rec2 = self.get_latest_record(rec['StuID'], 'Random')
                 if rec2 is not {}:
                     if rec2['IsSuc'] is 'True':
                         rec.update({'checkinResult': '迟到'})
@@ -277,11 +290,42 @@ class AutoCheckin(BaseCheckin):
                 rec.update({'checkinResult': '缺勤'})
                 detail_file.write_file([rec], 'ab')
                 continue
-        ManCheckin.confirmLeave(detail_file)
-        self.updateSum()
+        ManCheckin.confirm_leave(detail_file)
+        self.update_sum()
 
 
 if __name__ == '__main__':
     c =AutoCheckin('w_101')
     c.start_checkin()
-    c.join_checkin('')
+    while True:
+        c.join_checkin('wfsf_135')
+    # c.joincheckin('wfsf_119')
+    # c.joincheckin('wfsf_118')
+    # c.joincheckin('wfsf_117')
+    # c.joincheckin('wfsf_116')
+    # c.joincheckin('wfsf_115')
+    # c.joincheckin('wfsf_129')
+    # c.joincheckin('wfsf_128')
+    # c.joincheckin('wfsf_127')
+    # c.joincheckin('wfsf_126')
+    # c.joincheckin('wfsf_125')
+    # c.joincheckin('wfsf_139')
+    # c.joincheckin('wfsf_138')
+    # c.joincheckin('wfsf_137')
+    # c.joincheckin('wfsf_136')
+    # c.joincheckin('wfsf_135')
+    # c.joincheckin('wfsf_109')
+    # c.joincheckin('wfsf_108')
+    # c.joincheckin('wfsf_107')
+    # c.joincheckin('wfsf_106')
+    # c.joincheckin('wfsf_105')
+    # c.joincheckin('wfsf_99')
+    # c.joincheckin('wfsf_98')
+    # c.joincheckin('wfsf_97')
+    # c.joincheckin('wfsf_96')
+    # c.joincheckin('wfsf_95')
+    # c.joincheckin('wfsf_89')
+    # c.joincheckin('wfsf_88')
+    # c.joincheckin('wfsf_87')
+    # c.joincheckin('wfsf_86')
+    # c.joincheckin('wfsf_85')

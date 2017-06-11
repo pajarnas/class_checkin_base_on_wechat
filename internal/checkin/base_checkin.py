@@ -158,7 +158,7 @@ class BaseCheckin(Subject):
                 sum_rec_dict.update({'checkin' + str(i): 'None'})
             sum_records.append(sum_rec_dict)
         for i in range(1, int(self.seq_id) + 1):
-            detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id,self.crs_id,self.seq_id))
+            detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id,self.crs_id,i))
             detail_records = self.filter_invalid_detail_records(detail_records)
             for detail_rec in detail_records:
                 for sum_rec in sum_records:
