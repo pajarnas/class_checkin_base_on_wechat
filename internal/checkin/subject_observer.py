@@ -41,7 +41,8 @@ class TimeWindowObserver(Observer):
 
         if isinstance(self.checkin_obj.time_window.t, threading._Timer) :
              self.checkin_obj.time_window.t.cancel()
-             print 'cancel'
+	     print 'cancel time :'+ time.strftime('%H:%M:%S')
+         
 
 class EndcheckinObserver(Observer):
     def __init__(self,checkin_obj):
@@ -50,5 +51,5 @@ class EndcheckinObserver(Observer):
 
     def update(self):
         if isinstance(self.checkin_obj.time_window.t, threading._Timer):
-            print 'end checkin'
+ 	    print 'end checkin time :'+ time.strftime('%H:%M:%S')
         # self.checkin_obj.end_checkin()
