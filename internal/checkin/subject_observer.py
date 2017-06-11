@@ -38,11 +38,10 @@ class TimeWindowObserver(Observer):
         self.checkin_obj = checkin_obj
 
     def update(self):
-        # 问自己身上是否有计时器,有的话取消
+        # 只处理非正常结束计时器的考勤对象
         if isinstance(self.checkin_obj.time_window.t, threading._Timer) :
              self.checkin_obj.time_window.t.cancel()
-             print 'cancel time :' + time.strftime('%H:%M:%S')
-             print self.checkin_obj.tea_id
+             print 'cancel time :' + time.strftime('%H:%M:%S') +'__' +self.checkin_obj.tea_id
          
 
 class EndcheckinObserver(Observer):

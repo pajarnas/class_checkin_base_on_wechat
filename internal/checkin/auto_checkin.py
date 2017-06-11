@@ -109,7 +109,7 @@ class AutoCheckin(BaseCheckin):
             print PrtInfo.successMessage(7)
             BaseCheckin.checkin_list.append(self)
             print 'become head ,time 100 min'
-            self.time_window.start_timing(10)
+            self.time_window.start_timing(100)
 
     def get_stu_id_in_class_list(self, wechat_id):
         student_records = self.init_student_records()
@@ -301,103 +301,124 @@ if __name__ == '__main__':
     # c.entry_list()
 
 
-    # 时间窗口 测试用例2 输入:201 203 等待20秒后 等待100秒
-    c = AutoCheckin('w_101')
-    c.enter_time = '8:30'
-    c.section_id = 1
-    c.attach(EndcheckinObserver(c))
-    c.attach(TimeWindowObserver(c))
-    c.entry_list()
-    print 'start time' + time.strftime('%H:%M:%S')
-
-    d = AutoCheckin('w_102')
-    d.attach(EndcheckinObserver(d))
-    d.attach(TimeWindowObserver(d))
-    d.enter_time = '10:50'
-    d.entry_list()
-    print 'start time' + time.strftime('%H:%M:%S')
-
-    # 3
-    # 101 第1节课正在考勤201,第2节课,103考勤203(踢掉队首的代码)
-
-    #
-    # c = Autocheckin('w_101')
-    # c.enter_time = '8:30'
-    # c.section_id = 1
-    # checkin.checkin_list.append(c)
-    # d = Autocheckin('w_102')
-    # d.enter_time = '10:40'
-    # d.entryList()
-
-    # 场景4:101
-    # 第1节课正在考勤201, 第1节课, 102
-    # 正在考勤204, 第2节课, 103
-    # 要考勤205(第三个人踢掉队首的代码)
-
+    # 2
+    # 101考勤201
+    # 102考勤203
     # c = AutoCheckin('w_101')
-    # c.enter_time = '9:00'
+    # c.enter_time = '8:30'
     # c.section_id = 1
     # c.attach(EndcheckinObserver(c))
     # c.attach(TimeWindowObserver(c))
-    # BaseCheckin.checkin_list.append(c)
-    #
-    # e = AutoCheckin('w_102')
-    # e.enter_time = '9:05'
-    # e.section_id = 1
-    # e.attach(EndcheckinObserver(e))
-    # e.attach(TimeWindowObserver(e))
-    # BaseCheckin.checkin_list.append(e)
-    #
-    # d = AutoCheckin('w_103')
+    # c.entry_list()
+    # print 'start time' + time.strftime('%H:%M:%S')
+    # time.sleep(20)
+    # d = AutoCheckin('w_102')
     # d.attach(EndcheckinObserver(d))
     # d.attach(TimeWindowObserver(d))
-    # d.enter_time = '10:30'
+    # d.enter_time = '10:50'
     # d.entry_list()
-    # #
-    # 场景5:101
-    # 第1节课正在考勤201, 第1节课, 102
-    # 正在考勤204, 第2节课, 103
-    # 要考勤206(第三个人踢掉中间的代码)
+    # print 'start time' + time.strftime('%H:%M:%S')
 
-    # c = Autocheckin('w_101')
+    # 3
+    # 101考勤201
+    # 103考勤204
+    # c = AutoCheckin('w_101')
     # c.enter_time = '8:30'
-    # c.section_id = 1
-    # checkin.checkin_list.append(c)
+    # c.entry_list()
+    # c.attach(EndcheckinObserver(c))
+    # c.attach(TimeWindowObserver(c))
+    # print 'start time' + time.strftime('%H:%M:%S')
     #
-    # e = Autocheckin('w_102')
-    # e.enter_time = '8:31'
-    # e.section_id = 1
-    # checkin.checkin_list.append(e)
-    #
-    # d = Autocheckin('w_103')
-    # d.enter_time = '10:40'
-    # d.entryList()
+    # time.sleep(20)
+    # d = AutoCheckin('w_102')
+    # d.enter_time = '8:50'
+    # d.entry_list()
+    # d.attach(EndcheckinObserver(d))
+    # d.attach(TimeWindowObserver(d))
+    # print 'start time' + time.strftime('%H:%M:%S')
 
-    # 场景6:101
-    # 第1节课正在考勤201;
-    # 102
-    # 正在第1节课考勤204;
-    # 104
-    # 第二节课要考勤(第三个人踢掉前面两个班, 成为队首中间的代码)
-    # e = Autocheckin('w_102')
-    # e.enter_time = '8:30'
-    # e.section_id = 1
-    # checkin.checkin_list.append(e)
+    # # 场景4:
+    # # 101考勤201,
+    # # 102考勤204,
+    # # 103考勤205
     #
-    # c = Autocheckin('w_101')
-    # c.enter_time = '8:31'
-    # c.section_id = 1
-    # checkin.checkin_list.append(c)
+    # c = AutoCheckin('w_101')
+    # c.enter_time = '9:40'
+    # c.entry_list()
+    # c.attach(EndcheckinObserver(c))
+    # c.attach(TimeWindowObserver(c))
+    # print 'start time' + time.strftime('%H:%M:%S')
     #
+    # time.sleep(20)
+    # d = AutoCheckin('w_102')
+    # d.enter_time = '10:00'
+    # d.entry_list()
+    # d.attach(EndcheckinObserver(d))
+    # d.attach(TimeWindowObserver(d))
+    # print 'start time' + time.strftime('%H:%M:%S')
     #
-    # print checkin.checkin_list[0].class_list
-    # print checkin.checkin_list[1].class_list
-    # d = Autocheckin('w_104')
-    # d.enter_time = '10:40'
-    #
-    # print d.class_list
-    # d.entryList()
+    # time.sleep(30)
+    # e = AutoCheckin('w_103')
+    # e.enter_time = '10:30'
+    # e.entry_list()
+    # e.attach(EndcheckinObserver(e))
+    # e.attach(TimeWindowObserver(e))
+    # print 'start time' + time.strftime('%H:%M:%S')
 
+    # # 场景5:
+    # # 101考勤201,
+    # # 102考勤204,
+    # # 104考勤207
+    #
+    # c = AutoCheckin('w_101')
+    # c.enter_time = '9:40'
+    # c.entry_list()
+    # c.attach(EndcheckinObserver(c))
+    # c.attach(TimeWindowObserver(c))
+    # print 'start time' + time.strftime('%H:%M:%S')
+    #
+    # time.sleep(20)
+    # d = AutoCheckin('w_102')
+    # d.enter_time = '10:00'
+    # d.entry_list()
+    # d.attach(EndcheckinObserver(d))
+    # d.attach(TimeWindowObserver(d))
+    # print 'start time' + time.strftime('%H:%M:%S')
+    #
+    # time.sleep(30)
+    # e = AutoCheckin('w_104')
+    # e.enter_time = '10:30'
+    # e.entry_list()
+    # e.attach(EndcheckinObserver(e))
+    # e.attach(TimeWindowObserver(e))
+    # print 'start time' + time.strftime('%H:%M:%S')
+    # 场景6:
+    # 101考勤201,
+    # 102考勤204,
+    # 103考勤206
+
+    c = AutoCheckin('w_101')
+    c.enter_time = '9:40'
+    c.entry_list()
+    c.attach(EndcheckinObserver(c))
+    c.attach(TimeWindowObserver(c))
+    print 'start time' + time.strftime('%H:%M:%S')
+
+    time.sleep(20)
+    d = AutoCheckin('w_102')
+    d.enter_time = '10:00'
+    d.entry_list()
+    d.attach(EndcheckinObserver(d))
+    d.attach(TimeWindowObserver(d))
+    print 'start time' + time.strftime('%H:%M:%S')
+
+    time.sleep(30)
+    e = AutoCheckin('w_103')
+    e.enter_time = '10:30'
+    e.entry_list()
+    e.attach(EndcheckinObserver(e))
+    e.attach(TimeWindowObserver(e))
+    print 'start time' + time.strftime('%H:%M:%S')
 # c = Autocheckin('wonka80')#创建对象,完成考勤对象依赖的初始化
     # 测试多组用户学生在 1全局队列为空 2 时间窗口为5秒 3 在时间窗口之内提交的数据 通过
     # c.startcheckin()
