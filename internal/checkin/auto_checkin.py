@@ -1,13 +1,12 @@
 #encoding=utf-8
-from internal.base_file.base_file import BaseFile,DetailFile,SumFile,CourseFile
+from checkin.internal.base_file.base_file import BaseFile,DetailFile,SumFile,CourseFile
 from base_checkin import BaseCheckin
 from man_checkin import ManCheckin
 from subject_observer import EndcheckinObserver,TimeWindowObserver
-from printinfo import PrtInfo
-from my_exceptions import NouFoundException,WrongException
+from checkin.printinfo import PrtInfo
+from checkin.my_exceptions import NouFoundException,WrongException
 from __init__ import ReadIni
 from time_window import TimeWindow
-from time import ctime
 import random,time
 
 
@@ -110,7 +109,7 @@ class AutoCheckin(BaseCheckin):
             print PrtInfo.successMessage(7)
             BaseCheckin.checkin_list.append(self)
             print 'become head ,time 100 min'
-            self.time_window.start_timing(100)
+            self.time_window.start_timing(10)
 
     def get_stu_id_in_class_list(self, wechat_id):
         student_records = self.init_student_records()
@@ -309,13 +308,14 @@ if __name__ == '__main__':
     c.attach(EndcheckinObserver(c))
     c.attach(TimeWindowObserver(c))
     c.entry_list()
-
+    print 'start time' + time.strftime('%H:%M:%S')
 
     d = AutoCheckin('w_102')
     d.attach(EndcheckinObserver(d))
     d.attach(TimeWindowObserver(d))
     d.enter_time = '10:50'
     d.entry_list()
+    print 'start time' + time.strftime('%H:%M:%S')
 
     # 3
     # 101 第1节课正在考勤201,第2节课,103考勤203(踢掉队首的代码)

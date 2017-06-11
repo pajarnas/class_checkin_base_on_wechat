@@ -1,7 +1,7 @@
 #encoding=utf-8
 from subject_observer import Subject
-from internal.base_file.base_file import BaseFile,SeqFile,SumFile,DetailFile,StudentFile,CourseFile,TeacherFile
-from printinfo import PrtInfo
+from checkin.internal.base_file.base_file import BaseFile,SeqFile,SumFile,DetailFile,StudentFile,CourseFile,TeacherFile
+from checkin.printinfo import PrtInfo
 import time
 import os
 
@@ -17,7 +17,7 @@ class BaseCheckin(Subject):
 
     # 当边界类确定系统时间是合法的时候 才能创建自动考勤对象
     def __init__(self, wechat_id):
-
+        Subject.__init__(self)
         self.wechat_id = wechat_id
         self.tea_id = BaseCheckin.init_teacher_id_by_wechatid(wechat_id)
         self.crs_id = BaseCheckin.init_course_id_by_wechatid(wechat_id)

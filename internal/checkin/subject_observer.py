@@ -1,11 +1,12 @@
 #encoding=utf-8
 
 from abc import ABCMeta, abstractmethod
-import threading
-from time import ctime
+import threading,time
+
 class Subject():
     __metaclass__ = ABCMeta
-    observers=[]
+    def __init__(self):
+        self.observers=[]
 
     @abstractmethod
     def attach(self,observer):
@@ -38,10 +39,10 @@ class TimeWindowObserver(Observer):
 
     def update(self):
         # 问自己身上是否有计时器,有的话取消
-
         if isinstance(self.checkin_obj.time_window.t, threading._Timer) :
              self.checkin_obj.time_window.t.cancel()
-	     print 'cancel time :'+ time.strftime('%H:%M:%S')
+             print 'cancel time :' + time.strftime('%H:%M:%S')
+             print self.checkin_obj.tea_id
          
 
 class EndcheckinObserver(Observer):
@@ -50,6 +51,7 @@ class EndcheckinObserver(Observer):
         self.checkin_obj = checkin_obj
 
     def update(self):
-        if isinstance(self.checkin_obj.time_window.t, threading._Timer):
- 	    print 'end checkin time :'+ time.strftime('%H:%M:%S')
+        print 'end checkin time :'+ time.strftime('%H:%M:%S') +'__' +self.checkin_obj.tea_id
         # self.checkin_obj.end_checkin()
+
+

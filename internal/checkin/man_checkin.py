@@ -1,7 +1,7 @@
 #encoding=utf-8
-from internal.base_file.base_file import BaseFile,DetailFile,SumFile
+from checkin.internal.base_file.base_file import BaseFile,DetailFile,SumFile
 from base_checkin import BaseCheckin
-from printinfo import PrtInfo
+from checkin.printinfo import PrtInfo
 import os,time
 
 
