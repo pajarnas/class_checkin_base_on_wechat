@@ -2,6 +2,7 @@
 
 from abc import ABCMeta, abstractmethod
 import threading
+from time import ctime
 class Subject():
     __metaclass__ = ABCMeta
     observers=[]
@@ -37,9 +38,10 @@ class TimeWindowObserver(Observer):
 
     def update(self):
         # 问自己身上是否有计时器,有的话取消
-        print 'checkin obj cancle timing'
+
         if isinstance(self.checkin_obj.time_window.t, threading._Timer) :
              self.checkin_obj.time_window.t.cancel()
+             print 'cancel'
 
 class EndcheckinObserver(Observer):
     def __init__(self,checkin_obj):
@@ -47,5 +49,6 @@ class EndcheckinObserver(Observer):
         self.checkin_obj = checkin_obj
 
     def update(self):
-        print 'end checkin'
+        if isinstance(self.checkin_obj.time_window.t, threading._Timer):
+            print 'end checkin'
         # self.checkin_obj.end_checkin()

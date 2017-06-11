@@ -7,8 +7,8 @@ from printinfo import PrtInfo
 from my_exceptions import NouFoundException,WrongException
 from __init__ import ReadIni
 from time_window import TimeWindow
-import time
-import random
+from time import ctime
+import random,time
 
 
 class AutoCheckin(BaseCheckin):
@@ -66,8 +66,8 @@ class AutoCheckin(BaseCheckin):
         if BaseCheckin.checkin_list == []:
             # print PrtInfo.successMessage(7)
             BaseCheckin.checkin_list.append(self)
-            self.time_window.start_timing(10)
-            print 'enter OK,start timing 10 s'
+            self.time_window.start_timing(100)
+            print 'enter OK,start timing 100 s'
             return True
         # 非空
         kick_head = False
@@ -83,7 +83,6 @@ class AutoCheckin(BaseCheckin):
                         # print PrtInfo.successMessage(6)
                     print 'Kick one OK'
                     checkin_obj.notify()
-
                     BaseCheckin.checkin_list.remove(checkin_obj)
                 # 节次一样,无法进入,退出函数
                 else:
@@ -111,7 +110,7 @@ class AutoCheckin(BaseCheckin):
             print PrtInfo.successMessage(7)
             BaseCheckin.checkin_list.append(self)
             print 'become head ,time 100 min'
-            self.time_window.start_timing(10)
+            self.time_window.start_timing(100)
 
     def get_stu_id_in_class_list(self, wechat_id):
         student_records = self.init_student_records()
@@ -297,20 +296,26 @@ class AutoCheckin(BaseCheckin):
 
 if __name__ == '__main__':
     # 时间窗口 测试用例1
+    # c = AutoCheckin('w_101')
+    # c.attach(EndcheckinObserver(c))
+    # c.attach(TimeWindowObserver(c))
+    # c.entry_list()
+
+
+    # 时间窗口 测试用例2 输入:201 203 等待20秒后 等待100秒
     c = AutoCheckin('w_101')
+    c.enter_time = '8:30'
+    c.section_id = 1
     c.attach(EndcheckinObserver(c))
     c.attach(TimeWindowObserver(c))
     c.entry_list()
 
 
-    # 2
-    # c = Autocheckin('w_101')
-    # c.enter_time = '8:30'
-    # c.section_id = 1
-    # checkin.checkin_list.append(c)
-    # d = Autocheckin('w_102')
-    # c.enter_time = '8:40'
-    # c.entryList()
+    d = AutoCheckin('w_102')
+    d.attach(EndcheckinObserver(d))
+    d.attach(TimeWindowObserver(d))
+    d.enter_time = '10:50'
+    d.entry_list()
 
     # 3
     # 101 第1节课正在考勤201,第2节课,103考勤203(踢掉队首的代码)
