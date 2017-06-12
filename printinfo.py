@@ -1,4 +1,4 @@
-class PrtInfo():
+asflialifflijasliasfjfsailjfa
     def __init__(self):
         pass
 
