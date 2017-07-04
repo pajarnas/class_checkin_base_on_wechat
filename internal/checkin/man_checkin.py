@@ -28,18 +28,23 @@ class ManCheckin (BaseCheckin):
         return False
 
     @staticmethod
-    def confirm_leave(detail_file):
+    def confirm_leave(obj,detail_file):
         records = BaseFile.read_file(detail_file.name)
         leave_list = []
         for rec in records:
-            if rec['checkinResult'] is '假条提交':
+            if rec['checkinResult'] == '假条提交':
                 leave_list.append(rec)
         if leave_list is not []:
             print 'You have ' + str(leave_list.__len__()) + ' leave events to handle!'
             for line in leave_list:
+                print 'Name:' + BaseCheckin.get_student_name(obj,line['StuID'])
+                print 'Image:' + line['ProofPath']
                 if raw_input(PrtInfo.promptMessage(8)) == 'y':
+
+                    print line['ProofPath']
                     line['checkinResult'] = '请假'
                 else:
+                    print line['ProofPath']
                     line['checkinResult'] = '缺勤'
                 detail_file.write_file([line], 'ab')
 

@@ -114,6 +114,13 @@ class BaseCheckin(Subject):
         print PrtInfo.successMessage(1)
         return temp_list
 
+    # 获取从文件中该考勤对象的某学生的name
+    def get_student_name(self,id):
+        stu_records = self.init_student_records()
+        for i in stu_records:
+            if i['StuID'] == id:
+                 return i['StuName']
+
     # 将本次考勤次序号保存写入文件
     def add_seq_id(self, seq_id):
         seq_rec = {'TeacherID':self.tea_id,

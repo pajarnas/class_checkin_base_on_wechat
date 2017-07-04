@@ -41,6 +41,7 @@ class TimeWindow:
         self.t = threading.Timer(dev, self.time_next)
         self.t.start()
 
+    # 返回
     def dev(self, t2, t3):
         return (int(t3.split(':')[0]) - int(t2.split(':')[0])) * 60 + int(t3.split(':')[1]) - int(t2.split(':')[1])
 

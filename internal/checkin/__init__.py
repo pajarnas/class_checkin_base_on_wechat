@@ -40,17 +40,8 @@ class ReadIni :
         class_time_list.append(time_dict)
         return class_time_list
 
-if __name__ == '__main__':
-
-    def initSectionId(nowtime):
-        t = ReadIni()
-        nowtime = int(''.join(nowtime.split(':')))
-        for i in range(0, 5, 1):
-            e = int(''.join(t.class_time_list[i]['EndTime'].split(':')))
-            s = int(''.join(t.class_time_list[i]['StartTime'].split(':')))
-            if (nowtime >= s) & (nowtime <= e):
-                return i + 1
-        else:
-            return 0
-    print initSectionId('10:40')
+    def read_late_dev(self,):
+        cf = ConfigParser.ConfigParser()
+        cf.read('../settings.ini')
+        return int(cf.get('latedev', 'latedev'))
 
