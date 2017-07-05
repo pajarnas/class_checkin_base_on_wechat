@@ -1,4 +1,4 @@
-asdasd
+class PrtInfo():
     def __init__(self):
         pass
 

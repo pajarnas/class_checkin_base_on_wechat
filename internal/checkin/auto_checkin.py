@@ -122,7 +122,7 @@ class AutoCheckin(BaseCheckin):
             return 'True'
         if i is 1:
             return 'False'
-
+    
     def cancel_leave(self, stu_id):
         dict = {'StuID': stu_id,
          'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -243,7 +243,7 @@ class AutoCheckin(BaseCheckin):
         else:
             t1 = ((auto_rec['checkinTime'].split(' '))[1])[0:5]
             t2 = ((ran_rec['checkinTime'].split(' '))[1])[0:5]
-            dev_time = dev = int(self.time_window.dev(t1, t2))
+            dev_time = int(self.time_window.dev(t1, t2))
             if is_late:
                 if auto_rec['IsSuc'] == 'False' and dev_time > 0:
                     auto_rec.update({'checkinResult':'早退'})
@@ -263,10 +263,9 @@ class AutoCheckin(BaseCheckin):
         detail_file = DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id))
         for stu in self.init_student_records():
             auto_rec = self.get_latest_record(stu['StuID'],'Auto')
-            ran_rec = {}
+            ran_rec = self.get_latest_record(stu['StuID'],'Random')
             # 没有签到的学生 缺勤 追加到文件中
             if auto_rec == {}:
-                ran_rec = self.get_latest_record(stu['StuID'], 'Random')
                 if ran_rec == {}:
                     auto_rec = {'StuID': stu['StuID'],
                            'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
@@ -282,7 +281,10 @@ class AutoCheckin(BaseCheckin):
                 continue
             # 得到迟到标记,自助考勤最新记录,抽点考勤最新记录
             if ran_rec == {}:
-                auto_rec.update({'checkinResult':self.is_late(auto_rec)})
+                if auto_rec['IsSuc'] == 'True':
+                    auto_rec.update({'checkinResult':self.is_late(auto_rec)})
+                else:
+                    auto_rec.update({'checkinResult': '缺勤'})
                 detail_file.write_file([auto_rec], 'ab')
                 continue
             else:
@@ -300,7 +302,7 @@ if __name__ == '__main__':
     # while True:
     #     c.join_checkin('wfsf_135')
     c.seq_id = 1
-    c.enter_time = '22:29'
+    c.enter_time = '22:14'
     c.end_checkin()
     c.update_sum()
     # c.joincheckin('wfsf_119')
