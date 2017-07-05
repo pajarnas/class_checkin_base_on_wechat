@@ -5,9 +5,8 @@ import threading
 from checkin.printinfo import PrtInfo
 from base_checkin import BaseCheckin
 
+
 class TimeWindow:
-
-
 
     def __init__(self):
         self.t = None
@@ -37,7 +36,7 @@ class TimeWindow:
         dev = int(100) - self.dev(t2, t3)
         self.start_timing(dev)
 
-    def start_timing(self, dev=100):
+    def start_timing(self, dev=6000):
         self.t = threading.Timer(dev, self.time_next)
         self.t.start()
 

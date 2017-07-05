@@ -145,15 +145,16 @@ class BaseCheckin(Subject):
     def filter_invalid_detail_records(detail_records):
         id_list = []
         for stu in detail_records:
-            if stu['StuID'] not in id_list:
+            if stu['StuID']:
                 id_list.append(stu['StuID'])
-        temp_dict = {}
+        id_list = list(set(id_list))
         temp_list = []
+        detail_records.reverse()
         for id_line in id_list:
             for rec in detail_records:
-                if rec['StuID'] is id_line:
-                    temp_dict = rec
-            temp_list.append(temp_dict)
+                if rec['StuID'] == id_line:
+                    temp_list.append(rec)
+                    break
         return temp_list
 
     # 大更新 不需要参数 自动完成所有相关detail的更新
@@ -212,4 +213,10 @@ class BaseCheckin(Subject):
         print PrtInfo.successMessage(4)
 
 if __name__ == '__main__':
-    print BaseCheckin.init_seq_id(101,202)
+    l = BaseFile.read_file('101_201_1_checkinDetail.csv')
+    for i in l:
+        print i['StuID']+ i['checkinResult']
+    l2 = BaseCheckin.filter_invalid_detail_records(l)
+    print '------------------------'
+    for i in l2:
+        print i['StuID'] + i['checkinResult']
