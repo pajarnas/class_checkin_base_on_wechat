@@ -10,8 +10,9 @@ class ManCheckin (BaseCheckin):
     def __init__(self, wechat_id):
         BaseCheckin.__init__(self,wechat_id)
 
-    def update_stu_detail_checkin_result(self, stu_id, seq_id):
-        detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id, self.crs_id, seq_id))
+    @staticmethod
+    def update_stu_detail_checkin_result(stu_id, seq_id,tea_id,crs_id):
+        detail_records = BaseFile.read_file(BaseCheckin.init_detail_name(tea_id,crs_id, seq_id))
         for detail_rec in detail_records:
             if detail_rec['StuID'] == str(stu_id):
                 if detail_rec['checkinResult'] == '请假提交':
@@ -21,7 +22,7 @@ class ManCheckin (BaseCheckin):
                         detail_rec['checkinResult'] = '缺勤'
                 detail_rec['checkinResult'] = raw_input(PrtInfo.promptMessage(4))
                 print PrtInfo.successMessage(0)+detail_rec['checkinResult']
-                detail_file = DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id))
+                detail_file = DetailFile(BaseCheckin.init_detail_name(tea_id, crs_id, seq_id))
                 detail_file.write_file(detail_records)
                 return True
         print PrtInfo.notFoundMessage(3)

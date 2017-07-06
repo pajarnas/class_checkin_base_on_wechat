@@ -1,23 +1,26 @@
 #encoding=utf-8
-from subject_observer import Subject
+import os
+import time
+
 import checkin.importcsv.fileimport.import_course
 import checkin.importcsv.fileimport.import_student
 import checkin.importcsv.fileimport.import_teacher
-from checkin.internal.base_file.base_file import BaseFile,SeqFile,SumFile,DetailFile,StudentFile,CourseFile,TeacherFile
-from checkin.printinfo import PrtInfo
+from checkin.forms.base_form import Form
+from checkin.internal.base_file.base_file import BaseFile, SeqFile, SumFile, DetailFile, StudentFile, CourseFile, \
+    TeacherFile
 from checkin.my_exceptions import NouFoundException
-import time
-import os
+from checkin.printinfo import PrtInfo
+from subject_observer import Subject
 
 
 class BaseCheckin(Subject):
 
     checkin_list = []
 
-    seq_file = SeqFile('../seq.csv')
-    student_file = StudentFile('../test_student.csv')
-    course_file = CourseFile('../test_course.csv')
-    teacher_file = TeacherFile('../test_teacher.csv')
+    seq_file = SeqFile('./internal/seq.csv')
+    student_file = StudentFile('./internal/test_student.csv')
+    course_file = CourseFile('./internal/test_course.csv')
+    teacher_file = TeacherFile('./internal/test_teacher.csv')
 
     # 当边界类确定系统时间是合法的时候 才能创建自动考勤对象
     def __init__(self, wechat_id):
@@ -47,6 +50,7 @@ class BaseCheckin(Subject):
             checkin.importcsv.fileimport.import_student.ImportStudentInfo()
         if not os.path.exists(self.teacher_file.name):
             checkin.importcsv.fileimport.import_teacher.ImportTeacherInfo()
+
     @staticmethod
     # 某一教师某一次课在目前seq本地数据源文件获取中最新id
     def init_seq_id(tea_id, crs_id):
@@ -65,12 +69,12 @@ class BaseCheckin(Subject):
     @staticmethod
     # 某一教师某一次课某一次序的考勤详细表名字
     def init_detail_name(tea_id,crs_id,seq_id):
-        return '_'.join([str(tea_id),str(crs_id),str(seq_id)])+'_checkinDetail.csv'
+        return './internal/checkin_files/'+('_'.join([str(tea_id),str(crs_id),str(seq_id)]))+'_checkinDetail.csv'
 
     @staticmethod
     # 某一教师某一次课所有次序的考勤总表名字
     def init_sum_name(tea_id,crs_id):
-        return str(tea_id)+'_'+str(crs_id)+'_sum.csv'
+        return './internal/checkin_files/'+str(tea_id)+'_'+str(crs_id)+'_sum.csv'
 
     @staticmethod
     # 某一微信号在目前teacher_info本地数据源文件对应的教师id
@@ -81,6 +85,7 @@ class BaseCheckin(Subject):
             if record['WeChatID'] == wechat_id:
                 tea_id = record['TeacherID']
         return tea_id
+
 
     @staticmethod
     # 通过终端确定某一个教师对应的所有课程号中哪一个
@@ -102,6 +107,45 @@ class BaseCheckin(Subject):
                 print PrtInfo.notFoundMessage(2)
             else:
                 return crs_id
+
+    @staticmethod
+    # 通过学生微信号判断并找到要参加的考勤对象
+    def find_checkin_obj_with_wechat_id(wechat_id):
+        if BaseCheckin.checkin_list == []:
+            print PrtInfo.failedMessage(0)
+            return None
+        else:
+            print PrtInfo.promptMessage(10)
+            tea_ids = []
+            for i in BaseCheckin.checkin_list:
+                tea_ids.append(i.tea_id)
+            choice = Form('teacher id',tea_ids).init_form()
+            tea_id = tea_ids[choice - 1]
+            for i in BaseCheckin.checkin_list:
+                if i.tea_id == tea_id:
+                    if i.get_stu_id_in_class_list(wechat_id) != None:
+                        return i
+                    else:
+                        print PrtInfo.notFoundMessage(4)
+                        return None
+            else:
+                print PrtInfo.failedMessage(0)
+                return None
+
+    @staticmethod
+    # 通过学生微信号判断并找到要参加的考勤对象
+    def find_checkin_obj_for_tea(wechat_id):
+        if BaseCheckin.checkin_list == []:
+            print PrtInfo.failedMessage(0)
+            return None
+        else:
+            tea_id = BaseCheckin.init_teacher_id_by_wechatid(wechat_id)
+            for i in BaseCheckin.checkin_list:
+                if i.tea_id == tea_id:
+                        return i
+            else:
+                print PrtInfo.failedMessage(0)
+                return None
 
     # 获取从文件中该考勤对象的所有学生
     def init_student_records(self):
@@ -137,7 +181,7 @@ class BaseCheckin(Subject):
                 if (crs_rec['TeacherID'] == str(self.tea_id)) & (crs_rec['CourseID'] == str(self.crs_id)):
                     class_list.append(crs_rec['ClassNums'])
             if class_list == []:
-                raise NouFoundException, PrtInfo.notFoundMessage(5)
+                return None
             return class_list
 
     @staticmethod
@@ -195,7 +239,7 @@ class BaseCheckin(Subject):
         detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id, self.crs_id,seq_id))
         detail_records = self.filter_invalid_detail_records(detail_records)
         for rec in detail_records:
-            temp_dict = {'StuID': rec['StuID'], 'checkin'+str(seq_id): rec['checkinResult']}
+            temp_dict = {'StuID': rec['StuID'], 'checkin_files'+str(seq_id): rec['checkinResult']}
             result_records.append(temp_dict)
         sum_records = SumFile.read_file(self.init_sum_name(self.tea_id,self.crs_id))
         for s_rec in sum_records:
@@ -205,18 +249,15 @@ class BaseCheckin(Subject):
         sum_file = SumFile(self.init_sum_name(self.tea_id, self.crs_id))
         sum_file.columns = ['StuID']
         for i in range(1, int(self.seq_id) + 1):
-            sum_file.columns.append('checkin' + str(i))
+            sum_file.columns.append('checkin_files' + str(i))
         sum_file.write_file(sum_records)
 
     def write_detail_file(self, detail_records):
         DetailFile(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id)).write_file(detail_records)
         print PrtInfo.successMessage(4)
 
+
+
 if __name__ == '__main__':
-    l = BaseFile.read_file('101_201_1_checkinDetail.csv')
-    for i in l:
-        print i['StuID']+ i['checkinResult']
-    l2 = BaseCheckin.filter_invalid_detail_records(l)
-    print '------------------------'
-    for i in l2:
-        print i['StuID'] + i['checkinResult']
+    l = BaseCheckin.course_file.read_file(BaseCheckin.course_file.name)
+    print l

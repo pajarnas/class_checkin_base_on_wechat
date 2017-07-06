@@ -5,7 +5,7 @@ from man_checkin import ManCheckin
 from subject_observer import EndcheckinObserver,TimeWindowObserver
 from checkin.printinfo import PrtInfo
 from checkin.my_exceptions import NouFoundException,WrongException
-from __init__ import ReadIni
+from checkin.internal.checkin_files import ReadIni
 from time_window import TimeWindow
 import random, time
 
@@ -101,7 +101,8 @@ class AutoCheckin(BaseCheckin):
             if stu_rec['WeChatID'] == wechat_id:
                 return stu_rec['StuID']
         else:
-            raise NouFoundException,PrtInfo.notFoundMessage(3)
+            print PrtInfo.notFoundMessage(3)
+            return None
 
     def upload_path(self):
         return raw_input(PrtInfo.promptMessage(5))
@@ -283,11 +284,12 @@ class AutoCheckin(BaseCheckin):
                 continue
             else:
                 is_late = True if self.is_late(auto_rec) == '迟到' else False
-                auto_rec = self.get_compared_record(auto_rec,ran_rec,is_late)
+                auto_rec = self.get_compared_record(auto_rec, ran_rec, is_late)
                 detail_file.write_file([auto_rec], 'ab')
-        ManCheckin.confirm_leave(self,detail_file)
+        ManCheckin.confirm_leave(self, detail_file)
         self.update_sum()
 
 
 if __name__ == '__main__':
-    pass
+    c = AutoCheckin('101')
+    c.start_checkin()

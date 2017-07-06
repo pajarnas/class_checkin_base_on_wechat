@@ -11,9 +11,10 @@ class PrtInfo():
         if id == 3:
             return 'sorry,the student id not exist'
         if id == 4:
-            return 'sorry,you are not in random checkin in list'
+            return 'sorry,you are not in random checkin_files in list'
         if id == 5:
             return 'Not Found (5):'+'no class on lesson'
+
 
 
     @staticmethod
@@ -34,12 +35,16 @@ class PrtInfo():
             return 'please enter the seq id of check in detail file'
         if id == 8:
             return 'please confirm the leave result (y/n)'
+        if id == 0:
+            return 'please input your wechat id:'
+        if id == 10:
+            return 'please select teacher of class'
 
 
     @staticmethod
     def successMessage(id):
         if id == 0:
-            return 'Student checkin Result updated Successfully ,new record : '
+            return 'Student checkin_files Result updated Successfully ,new record : '
         if id == 1:
             return 'Student Records initialization Successful'
         if id == 2:
@@ -51,7 +56,7 @@ class PrtInfo():
         if id == 5:
             return 'Detail Records updated Successfully'
         if id == 6:
-            return "kick  previous checkin obj off Successfully"
+            return "kick  previous checkin_files obj off Successfully"
         if id == 7:
             return "join in the check in list Successfully"
         if id == 8:
@@ -67,11 +72,15 @@ class PrtInfo():
         if id == 0:
             return 'Wrong (0):'+'Time window is closed'
         if id == 1:
-            return 'Wrong (1): checkin type ,please try again'
+            return 'Wrong (1): checkin_files type ,please try again'
         if id == 2:
             return 'Wrong (2):'+'due to current class is on check in,failed to open time window'
         if id == 3:
             return 'Wrong (3):'+'Please open it during class or 5 minutes before'
+        if id == 4:
+            return 'Wrong (4):'+ 'Wrong wechat id'
+        if id == 5:
+            return 'Wrong (4):'+ 'Wrong wechat id or no such check in obj'
 
     @staticmethod
     def tipsMessage(id):

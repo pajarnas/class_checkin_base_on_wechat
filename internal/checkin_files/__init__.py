@@ -1,10 +1,9 @@
 #coding=utf-8
 import ConfigParser
 import re
-
-
+import os
 # 读取配置文件信息   节次信息    返回一个节次开始和结束时间的列表
-class ReadIni :
+class ReadIni():
 
     begin_time_list = [] # 设置一个列表存两节课的开始和结束时间
 
@@ -13,7 +12,7 @@ class ReadIni :
 
     def read_begin(self,class_time_list ):
         cf = ConfigParser.ConfigParser()
-        cf.read('../settings.ini')
+        cf.read('./internal/settings.ini')
 
         time = re.split('-|:', cf.get('sectime', 'sec1'))
         time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
@@ -42,6 +41,6 @@ class ReadIni :
 
     def read_late_dev(self,):
         cf = ConfigParser.ConfigParser()
-        cf.read('../settings.ini')
+        cf.read('./internal/settings.ini')
         return int(cf.get('latedev', 'latedev'))
 

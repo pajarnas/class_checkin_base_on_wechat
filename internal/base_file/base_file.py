@@ -79,3 +79,4 @@ class CourseFile(BaseFile):
     def __init__(self,name='../courseInfo.csv'):
         BaseFile.__init__(self,name)
 
+

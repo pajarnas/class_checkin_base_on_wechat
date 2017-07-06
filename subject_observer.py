@@ -50,7 +50,7 @@ class EndcheckinObserver(Observer):
         self.checkin_obj = checkin_obj
 
     def update(self):
-        print 'end checkin time :'+ time.strftime('%H:%M:%S') +'__' +self.checkin_obj.tea_id
+        print 'end checkin_files time :'+ time.strftime('%H:%M:%S') +'__' +self.checkin_obj.tea_id
         self.checkin_obj.end_checkin()
 
 
