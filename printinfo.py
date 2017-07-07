@@ -39,6 +39,8 @@ class PrtInfo():
             return 'please input your wechat id:'
         if id == 10:
             return 'please select teacher of class'
+        if id == 11:
+            return 'please enter the seq id(0 for all):'
 
 
     @staticmethod
@@ -86,6 +88,6 @@ class PrtInfo():
     def tipsMessage(id):
         if id == 0:
             return 'the check in list is empty!'
-
-
-
+r = range(1,5)
+print len(r)
+print r

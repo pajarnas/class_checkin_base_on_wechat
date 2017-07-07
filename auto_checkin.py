@@ -4,7 +4,6 @@ from base_checkin import BaseCheckin
 from man_checkin import ManCheckin
 from subject_observer import EndcheckinObserver,TimeWindowObserver
 from checkin.printinfo import PrtInfo
-from checkin.my_exceptions import NouFoundException,WrongException
 from checkin.internal.checkin_files import ReadIni
 from time_window import TimeWindow
 import random, time
@@ -68,17 +67,14 @@ class AutoCheckin(BaseCheckin):
                     if BaseCheckin.checkin_list.index(checkin_obj) == 0:
                         # 踢掉的是队首
                         kick_head = True
-                        # print PrtInfo.successMessage(6)
                     checkin_obj.notify()
                     BaseCheckin.checkin_list.remove(checkin_obj)
                 # 节次一样,无法进入,退出函数
                 else:
                     return False
-                    #raise WrongException, PrtInfo.failedMessage(2)
         # 队列中的所有班都与来者没有交集,或者有交集被踢出去
         if (intersection_flag is False) | (kick_head is False):
             # 没有交集 或者 踢掉的不是队首
-            #  print PrtInfo.successMessage(7)
             self.time_window.just_waiting()
             BaseCheckin.checkin_list.append(self)
         elif (intersection_flag is True) & (kick_head is True) & \
@@ -187,6 +183,9 @@ class AutoCheckin(BaseCheckin):
                 PrtInfo.successMessage(8)
                 return True
             elif checkin_type == 'Random':
+                if self.get_random_list() == []:
+                    print 'No random check in now'
+                    return False
                 if self.get_stu_id_in_class_list(wechat_id) not in self.get_random_list():
                     print PrtInfo.notFoundMessage(4)
                     return False

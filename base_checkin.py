@@ -119,7 +119,9 @@ class BaseCheckin(Subject):
             tea_ids = []
             for i in BaseCheckin.checkin_list:
                 tea_ids.append(i.tea_id)
-            choice = Form('teacher id',tea_ids).init_form()
+            choice = Form(['teacher id'],tea_ids).init_form()
+            if choice == -1:
+                return None
             tea_id = tea_ids[choice - 1]
             for i in BaseCheckin.checkin_list:
                 if i.tea_id == tea_id:
@@ -239,7 +241,7 @@ class BaseCheckin(Subject):
         detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id, self.crs_id,seq_id))
         detail_records = self.filter_invalid_detail_records(detail_records)
         for rec in detail_records:
-            temp_dict = {'StuID': rec['StuID'], 'checkin_files'+str(seq_id): rec['checkinResult']}
+            temp_dict = {'StuID': rec['StuID'], 'checkin'+str(seq_id): rec['checkinResult']}
             result_records.append(temp_dict)
         sum_records = SumFile.read_file(self.init_sum_name(self.tea_id,self.crs_id))
         for s_rec in sum_records:
@@ -249,7 +251,7 @@ class BaseCheckin(Subject):
         sum_file = SumFile(self.init_sum_name(self.tea_id, self.crs_id))
         sum_file.columns = ['StuID']
         for i in range(1, int(self.seq_id) + 1):
-            sum_file.columns.append('checkin_files' + str(i))
+            sum_file.columns.append('checkin' + str(i))
         sum_file.write_file(sum_records)
 
     def write_detail_file(self, detail_records):

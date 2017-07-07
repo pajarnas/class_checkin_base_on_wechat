@@ -18,7 +18,7 @@ class StartForm(Form):
 
     def __init__(self):
         self.path = [MainForm.name,TeacherForm.name,self.name]
-        self.items = ['start auto check in', 'start manual check in', 'back']
+        self.items = ['start auto check in', 'start manual check in','start random check in', 'back']
         Form.__init__(self, self.path, self.items)
 
 

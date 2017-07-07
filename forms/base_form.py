@@ -4,10 +4,10 @@ class Form():
 
     def __init__(self, path, items):
         self.path = path
-        self.items = items
+        self.items = [str(x) for x in items]
 
     def init_form(self):
-        length = max([(len(i) + 2) for i in self.items]) + 36
+        length = max([(len(str(i)) + 2) for i in self.items]) + 36
         heights = 2 + len(self.items)
         index = '->'.join(self.path)
 
@@ -37,9 +37,19 @@ class Form():
         return self.choice()
 
     def choice(self):
-        while True:
-            choice = int(raw_input('your choice :'))
-            if choice > int(len(self.items)) or choice < 1:
-                print 'wrong input, try again!'
-            else:
-                return choice
+        count = 0
+        while count < 3:
+            try:
+                choice = int(raw_input('your choice :'))
+                if choice > int(len(self.items)) or choice < 1:
+                    print 'wrong input, try again!'
+                    count += 1
+                    return -1
+                else:
+                    return choice
+            except ValueError,e:
+                print 'Valid input'
+                return -1
+
+
+
