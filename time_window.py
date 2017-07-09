@@ -1,7 +1,7 @@
 #-*- coding=UTF-8 -*-
-
-
+import sys
 import threading
+import signal
 from checkin.printinfo import PrtInfo
 from base_checkin import BaseCheckin
 
@@ -10,6 +10,7 @@ class TimeWindow:
 
     def __init__(self):
         self.t = None
+
         pass
 
     def just_waiting(self):
@@ -38,11 +39,14 @@ class TimeWindow:
 
     def start_timing(self, dev=6000):
         self.t = threading.Timer(dev, self.time_next)
+
         self.t.start()
 
     # 返回
     def dev(self, t2, t3):
         return (int(t3.split(':')[0]) - int(t2.split(':')[0])) * 60 + int(t3.split(':')[1]) - int(t2.split(':')[1])
+
+
 
 if __name__ == '__main__':
     def dev( t2, t3):

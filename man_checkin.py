@@ -55,9 +55,9 @@ class ManCheckin (BaseCheckin):
         for stu_rec in stu_records:
             temp_dict = {'StuID': stu_rec['StuID'],
                          'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
-                         'ProofPath': None,
+                         'ProofPath': 'Auto',
                          'checkinType': 'Man',
-                         'IsSuc': None,
+                         'IsSuc': 'True',
                          'checkinResult': '出勤'
                          }
             temp_list.append(temp_dict)

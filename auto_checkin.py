@@ -1,5 +1,5 @@
 #encoding=utf-8
-from checkin.internal.base_file.base_file import BaseFile,DetailFile,SumFile,CourseFile
+from checkin.internal.base_file.base_file import BaseFile,DetailFile
 from base_checkin import BaseCheckin
 from man_checkin import ManCheckin
 from subject_observer import EndcheckinObserver,TimeWindowObserver
@@ -35,9 +35,9 @@ class AutoCheckin(BaseCheckin):
         for stu_rec in stu_records:
                 temp_dict = {'StuID':stu_rec['StuID'],
                              'checkinTime':time.strftime('%Y-%m-%d %H:%M:%S'),
-                             'ProofPath':None,
+                             'ProofPath':'Auto',
                              'checkinType':'Auto',
-                             'IsSuc':None,
+                             'IsSuc':'False',
                              'checkinResult':'缺勤'
                              }
                 temp_list.append(temp_dict)
@@ -59,19 +59,23 @@ class AutoCheckin(BaseCheckin):
         # 非空
         kick_head = False
         for checkin_obj in BaseCheckin.checkin_list[:]:
-            if set(class_list) & set(checkin_obj.class_list):
-                # 存在交集
-                # 节次不一样 踢掉
-                if self.section_id != checkin_obj.section_id:
-                    intersection_flag = True
-                    if BaseCheckin.checkin_list.index(checkin_obj) == 0:
-                        # 踢掉的是队首
-                        kick_head = True
-                    checkin_obj.notify()
-                    BaseCheckin.checkin_list.remove(checkin_obj)
-                # 节次一样,无法进入,退出函数
-                else:
-                    return False
+            try:
+                if set(class_list) & set(checkin_obj.class_list):
+                    # 存在交集
+                    # 节次不一样 踢掉
+                    if self.section_id != checkin_obj.section_id:
+                        intersection_flag = True
+                        if BaseCheckin.checkin_list.index(checkin_obj) == 0:
+                            # 踢掉的是队首
+                            kick_head = True
+                        checkin_obj.notify()
+                        BaseCheckin.checkin_list.remove(checkin_obj)
+                    # 节次一样,无法进入,退出函数
+                    else:
+                        return False
+            except TypeError:
+                print 'invalid operation'
+                return False
         # 队列中的所有班都与来者没有交集,或者有交集被踢出去
         if (intersection_flag is False) | (kick_head is False):
             # 没有交集 或者 踢掉的不是队首
@@ -212,7 +216,7 @@ class AutoCheckin(BaseCheckin):
             if line in temp_list:
                 temp_dict = {'StuID': line['StuID'],
                              'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
-                             'ProofPath': 'none',
+                             'ProofPath': 'Auto',
                              'checkinType': 'Random',
                              'IsSuc':'none' ,
                              'checkinResult': 'init'
@@ -265,7 +269,7 @@ class AutoCheckin(BaseCheckin):
                            'checkinTime': time.strftime('%Y-%m-%d %H:%M:%S'),
                            'ProofPath': 'none',
                            'checkinType': 'Auto',
-                           'IsSuc': 'True',
+                           'IsSuc': 'False',
                            'checkinResult': '缺勤'}
                     detail_file.write_file([auto_rec], 'ab')
                     continue

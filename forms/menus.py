@@ -136,7 +136,7 @@ def start_checkin_menu():
     while True:
         wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = AutoCheckin(wechat_id)
-        if obj.tea_id == 0:
+        if obj == None:
             print PrtInfo.failedMessage(4)
             prompt = raw_input('maybe try again?(y/n)')
             if prompt == 'n':
@@ -157,7 +157,9 @@ def start_manual_menu():
             if prompt == 'n':
                 break
         else:
-            obj.init_detail_records()
+            obj.add_seq_id(obj.seq_id)
+            obj.write_detail_file(obj.init_detail_records())
+            obj.update_sum_by_certain_seq_id(obj.seq_id)
             break
 
 
@@ -166,15 +168,19 @@ def start_random_menu():
     while True:
         wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = BaseCheckin.find_checkin_obj_for_tea(wechat_id)
-        if obj.tea_id == 0:
+        if obj == None:
             print PrtInfo.failedMessage(4)
             prompt = raw_input('maybe try again?(y/n)')
             if prompt == 'n':
                 subprocess.call("clear")
                 break
         else:
-            obj.start_random_checkin()
-            break
+            try:
+                i = int(raw_input('Please input random number:'))
+                obj.start_random_checkin(i)
+                break
+            except ValueError,e:
+                print 'invalid input ,try again'
 
 
 def update_once_checkin():
@@ -193,7 +199,7 @@ def update_once_checkin():
             r.append('exit')
             c = Form(['seq id'], r)
             seq_id = c.init_form()
-            if c == len(r) or c == -1:
+            if seq_id == len(r) or seq_id == -1:
                 break
             obj.update_stu_detail_checkin_result(stu_id, seq_id,obj.tea_id,obj.crs_id)
             break
@@ -210,6 +216,7 @@ def sum_history():
             if prompt == 'n':
                 break
         else:
+            BaseCheckin.update_sum()
             sum_records = SumFile.read_file(BaseCheckin.init_sum_name(obj.tea_id,obj.crs_id))
             r = range(1, obj.init_seq_id(obj.tea_id, obj.crs_id))
             r.append('exit')
@@ -221,7 +228,7 @@ def sum_history():
                 c = Form(['seq id'], r)
                 seq_id = c.init_form()
                 sum_format(sum_records, seq_id=seq_id)
-                if c == len(r) or c == -1:
+                if seq_id == len(r) or seq_id == -1:
                     break
             sum_format(sum_records)
             break
@@ -238,12 +245,11 @@ def detail_history():
             if prompt == 'n':
                 break
         else:
-            print range(1, obj.init_seq_id(obj.tea_id, obj.crs_id) - 1)
             r = range(1, obj.init_seq_id(obj.tea_id, obj.crs_id))
             r.append('exit')
             c = Form(['seq id'], r)
             seq_id = c.init_form()
-            if c == len(r) or c == -1:
+            if seq_id == len(r) or seq_id == -1:
                 break
             detail_records = DetailFile.read_file(BaseCheckin.init_detail_name(obj.tea_id,obj.crs_id,seq_id))
             detail_format(detail_records)
@@ -261,11 +267,12 @@ def checkin_history():
             if prompt == 'n':
                 break
         else:
-            r = range(1,obj.init_seq_id(obj.tea_id, obj.crs_id))
+            r = range(1,obj.init_seq_id(obj.tea_id, obj.crs_id) )
             r.append('exit')
+            print len(r)
             c = Form(['seq id'],r)
             seq_id = c.init_form()
-            if c == len(r) or c == -1:
+            if seq_id == len(r) or seq_id == -1:
                 break
             detail_records = DetailFile.read_file(BaseCheckin.init_detail_name(obj.tea_id,obj.crs_id,seq_id))
             detail_format(BaseCheckin.filter_invalid_detail_records(detail_records))
@@ -287,9 +294,11 @@ def attendence():
             if c != None:
                 detail_records = BaseFile.read_file(c.init_detail_name(str(c.tea_id),str(c.crs_id),str(c.seq_id)))
                 detail_records = BaseCheckin.filter_invalid_detail_records(detail_records)
+                temp = []
                 for i in detail_records:
                     if i['IsSuc'] == 'True':
-                        print detail_format(i)
+                        temp.append(i)
+                print detail_format(temp)
                 break
 
 
@@ -308,9 +317,11 @@ def absence():
             if c != None:
                 detail_records = BaseFile.read_file(c.init_detail_name(str(c.tea_id),str(c.crs_id),str(c.seq_id)))
                 detail_records = BaseCheckin.filter_invalid_detail_records(detail_records)
+                temp = []
                 for i in detail_records:
                     if i['IsSuc'] == 'False':
-                        print detail_format(i)
+                        temp.append(i)
+                print detail_format(temp)
                 break
 
 

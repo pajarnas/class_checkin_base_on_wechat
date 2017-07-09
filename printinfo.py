@@ -88,6 +88,3 @@ class PrtInfo():
     def tipsMessage(id):
         if id == 0:
             return 'the check in list is empty!'
-r = range(1,5)
-print len(r)
-print r
