@@ -1,4 +1,6 @@
 import csv
+from checkin.internal.checkin_files import ReadIni
+
 
 
 class BaseFile:
@@ -41,7 +43,7 @@ class BaseFile:
 class SeqFile(BaseFile):
     columns = ['TeacherID','CourseID','SeqID','Time']
 
-    def __init__(self, name='../seq.csv'):
+    def __init__(self, name=ReadIni().read_path()['seq_path']):
         BaseFile.__init__(self, name)
 
 
@@ -62,21 +64,24 @@ class SumFile(BaseFile):
 class StudentFile(BaseFile):
     columns = ['StuID', 'StuName', 'ClassID', 'WeChatID', 'FeaturePath']
 
-    def __init__(self,name='../studentInfo.csv'):
+    def __init__(self,name=ReadIni().read_path()['stu_path']):
         BaseFile.__init__(self,name)
 
 
 class TeacherFile(BaseFile):
     columns = ["TeacherID", "TeacherName", "WeChatID"]
 
-    def __init__(self,name='../teacherInfo.csv'):
+    def __init__(self,name=ReadIni().read_path()['tea_path']):
         BaseFile.__init__(self,name)
 
 
 class CourseFile(BaseFile):
     columns = ['CourseID', 'CourseName', 'TeacherID', 'ClassNums']
 
-    def __init__(self,name='../courseInfo.csv'):
+    def __init__(self,name=ReadIni().read_path()['crs_path']):
         BaseFile.__init__(self,name)
 
 
+if __name__ == '__main__':
+    c = ReadIni()
+    c = c.read_begin()

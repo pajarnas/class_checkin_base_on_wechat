@@ -11,16 +11,18 @@ from checkin.internal.base_file.base_file import BaseFile, SeqFile, SumFile, Det
 from checkin.my_exceptions import NouFoundException
 from checkin.printinfo import PrtInfo
 from subject_observer import Subject
+from forms.base_form import Form
+from checkin.internal.checkin_files import ReadIni
 
 
 class BaseCheckin(Subject):
 
     checkin_list = []
 
-    seq_file = SeqFile('./internal/seq.csv')
-    student_file = StudentFile('./internal/test_student.csv')
-    course_file = CourseFile('./internal/test_course.csv')
-    teacher_file = TeacherFile('./internal/test_teacher.csv')
+    seq_file = SeqFile()
+    student_file = StudentFile()
+    course_file = CourseFile()
+    teacher_file = TeacherFile()
 
     # 当边界类确定系统时间是合法的时候 才能创建自动考勤对象
     def __init__(self, wechat_id):
@@ -69,12 +71,12 @@ class BaseCheckin(Subject):
     @staticmethod
     # 某一教师某一次课某一次序的考勤详细表名字
     def init_detail_name(tea_id,crs_id,seq_id):
-        return './internal/checkin_files/'+('_'.join([str(tea_id),str(crs_id),str(seq_id)]))+'_checkinDetail.csv'
+        return ReadIni().read_path()['files_path']+('_'.join([str(tea_id),str(crs_id),str(seq_id)]))+'_checkinDetail.csv'
 
     @staticmethod
     # 某一教师某一次课所有次序的考勤总表名字
     def init_sum_name(tea_id,crs_id):
-        return './internal/checkin_files/'+str(tea_id)+'_'+str(crs_id)+'_sum.csv'
+        return ReadIni().read_path()['files_path']+str(tea_id)+'_'+str(crs_id)+'_sum.csv'
 
     @staticmethod
     # 某一微信号在目前teacher_info本地数据源文件对应的教师id
@@ -100,13 +102,13 @@ class BaseCheckin(Subject):
             print PrtInfo.notFoundMessage(1)
             return 0
         while True:
-            print PrtInfo.promptMessage(2)
-            print crs_id_list
-            crs_id = raw_input(PrtInfo.promptMessage(1))
-            if crs_id not in crs_id_list:
-                print PrtInfo.notFoundMessage(2)
+            crs_id_list.append('back')
+            f = Form(['Course ID'],crs_id_list)
+            c = f.init_form()
+            if c == len(crs_id_list):
+                return 0
             else:
-                return crs_id
+                return f.items[c-1]
 
     @staticmethod
     # 通过学生微信号判断并找到要参加的考勤对象
@@ -138,7 +140,7 @@ class BaseCheckin(Subject):
     # 通过学生微信号判断并找到要参加的考勤对象
     def find_checkin_obj_for_tea(wechat_id):
         if BaseCheckin.checkin_list == []:
-            print PrtInfo.failedMessage(0)
+            print PrtInfo.failedMessage(6)
             return None
         else:
             tea_id = BaseCheckin.init_teacher_id_by_wechatid(wechat_id)
@@ -146,7 +148,7 @@ class BaseCheckin(Subject):
                 if i.tea_id == tea_id:
                         return i
             else:
-                print PrtInfo.failedMessage(0)
+                print PrtInfo.failedMessage(6)
                 return None
 
     # 获取从文件中该考勤对象的所有学生
@@ -205,22 +207,23 @@ class BaseCheckin(Subject):
 
     # 大更新 不需要参数 自动完成所有相关detail的更新
     def update_sum(self):
-        sum_records = []
-        for stu_rec in self.init_student_records():
-            sum_rec_dict = {'StuID': stu_rec['StuID']}
-            for i in range(1, int(self.seq_id) + 1):
-                sum_rec_dict.update({'checkin' + str(i): 'None'})
+        seq_id = self.init_seq_id(self.tea_id,self.crs_id)
+        sum_records = [] # 保存sum文件中所有记录
+        for stu_rec in self.init_student_records(): # 获取本班所有学生的记录
+            sum_rec_dict = {'StuID': stu_rec['StuID']} # 遍历学生记录列表
+            for i in range(1, int(seq_id)):# 将每一个学生在sum文件中都以{'StuID':'11222,'checkin1':'缺勤',....}形式保存
+                sum_rec_dict.update({'checkin' + str(i): 'None'}) # seq id 代表次序号,第1,2,3,4...次考勤
             sum_records.append(sum_rec_dict)
-        for i in range(1, int(self.seq_id) + 1):
+        for i in range(1, int(seq_id) ):
             detail_records = BaseFile.read_file(self.init_detail_name(self.tea_id,self.crs_id,i))
-            detail_records = self.filter_invalid_detail_records(detail_records)
+            detail_records = self.filter_invalid_detail_records(detail_records) # 读取每一次考勤记录的文件
             for detail_rec in detail_records:
                 for sum_rec in sum_records:
                     if sum_rec['StuID'] == detail_rec['StuID']:
                         sum_rec['checkin' + str(i)] = detail_rec['checkinResult']
         sum_file = SumFile(self.init_sum_name(self.tea_id, self.crs_id))
         sum_file.columns = ['StuID']
-        for i in range(1, int(self.seq_id) + 1):
+        for i in range(1, int(seq_id)):
             sum_file.columns.append('checkin' + str(i))
         sum_file.write_file(sum_records)
 

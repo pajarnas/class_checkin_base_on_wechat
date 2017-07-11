@@ -187,10 +187,11 @@ class AutoCheckin(BaseCheckin):
                 PrtInfo.successMessage(8)
                 return True
             elif checkin_type == 'Random':
-                if self.get_random_list() == []:
+                random_list = self.get_random_list()
+                if random_list == []:
                     print 'No random check in now'
                     return False
-                if self.get_stu_id_in_class_list(wechat_id) not in self.get_random_list():
+                if self.get_stu_id_in_class_list(wechat_id) not in random_list:
                     print PrtInfo.notFoundMessage(4)
                     return False
                 else:
@@ -206,8 +207,9 @@ class AutoCheckin(BaseCheckin):
         records = BaseFile.read_file(self.init_detail_name(self.tea_id, self.crs_id, self.seq_id))
         random_list = []
         for rec in records:
-            if rec['checkinType'] is 'Random' and rec['checkinResult'] is 'init':
+            if rec['checkinType'] == 'Random' and rec['checkinResult'] == 'init':
                 random_list.append(rec['StuID'])
+        return random_list
 
     def start_random_checkin(self,num):
         student_records = self.init_student_records()
@@ -226,8 +228,6 @@ class AutoCheckin(BaseCheckin):
     def is_late(self, rec):
         checkin_time = ((rec['checkinTime'].split(' '))[1])[0:5]
         dev = int(self.time_window.dev(self.enter_time, checkin_time))
-        print checkin_time
-        print dev
         t = ReadIni()
         if dev < t.read_late_dev():
            return '出勤'
@@ -273,9 +273,11 @@ class AutoCheckin(BaseCheckin):
                            'checkinResult': '缺勤'}
                     detail_file.write_file([auto_rec], 'ab')
                     continue
+                else:
+                    auto_rec = ran_rec
 
             # 签到 并且来的学生 检查是否请假
-            if auto_rec['checkinResult'] == '假条提交' :
+            if auto_rec != {} and auto_rec['checkinResult'] == '假条提交' :
                 continue
             # 得到迟到标记,自助考勤最新记录,抽点考勤最新记录
             if ran_rec == {}:
@@ -294,5 +296,6 @@ class AutoCheckin(BaseCheckin):
 
 
 if __name__ == '__main__':
-    c = AutoCheckin('101')
-    c.start_checkin()
+    c = AutoCheckin('w_101')
+    c.seq_id = 14
+    c.end_checkin()

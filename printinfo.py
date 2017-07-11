@@ -82,7 +82,9 @@ class PrtInfo():
         if id == 4:
             return 'Wrong (4):'+ 'Wrong wechat id'
         if id == 5:
-            return 'Wrong (4):'+ 'Wrong wechat id or no such check in obj'
+            return 'Wrong (5):'+ 'Wrong wechat id or no such check in obj'
+        if id == 6:
+            return 'Wrong (6):'+ 'please start check in first'
 
     @staticmethod
     def tipsMessage(id):

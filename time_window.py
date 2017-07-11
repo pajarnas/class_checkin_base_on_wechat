@@ -1,7 +1,6 @@
 #-*- coding=UTF-8 -*-
 import sys
 import threading
-import signal
 from checkin.printinfo import PrtInfo
 from base_checkin import BaseCheckin
 

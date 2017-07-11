@@ -124,6 +124,9 @@ def join_checkin_menu():
        wechat_id = raw_input(PrtInfo.promptMessage(0))
        t =  BaseCheckin.find_checkin_obj_with_wechat_id(wechat_id)
        if t != None:
+           if t.get_random_list() != []:
+               print 'Random check in student list :'
+               print  t.get_random_list()
            t.join_checkin(wechat_id)
        prompt = raw_input('maybe try again?(y/n)')
        if prompt == 'n':
@@ -216,20 +219,22 @@ def sum_history():
             if prompt == 'n':
                 break
         else:
-            BaseCheckin.update_sum()
+            BaseCheckin.update_sum(obj)
             sum_records = SumFile.read_file(BaseCheckin.init_sum_name(obj.tea_id,obj.crs_id))
             r = range(1, obj.init_seq_id(obj.tea_id, obj.crs_id))
             r.append('exit')
             q = Form(['seq id'], ['once', 'all', 'back'])
             ch = q.init_form()
+
             if ch == len(q.items) or ch == -1:
                 break
             elif ch == 1:
                 c = Form(['seq id'], r)
                 seq_id = c.init_form()
-                sum_format(sum_records, seq_id=seq_id)
                 if seq_id == len(r) or seq_id == -1:
                     break
+                sum_format(sum_records, seq_id=seq_id)
+                break
             sum_format(sum_records)
             break
 
@@ -300,6 +305,8 @@ def attendence():
                         temp.append(i)
                 print detail_format(temp)
                 break
+            else:
+                break
 
 
 def absence():
@@ -323,6 +330,8 @@ def absence():
                         temp.append(i)
                 print detail_format(temp)
                 break
+            else:
+                break
 
 
 def detail_now():
@@ -340,6 +349,8 @@ def detail_now():
             if c != None:
                 detail_records = BaseFile.read_file(c.init_detail_name(str(c.tea_id),str(c.crs_id),str(c.seq_id)))
                 detail_format(detail_records)
+                break
+            else:
                 break
 
 

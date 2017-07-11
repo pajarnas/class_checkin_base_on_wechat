@@ -2,17 +2,26 @@
 import ConfigParser
 import re
 import os
+
 # 读取配置文件信息   节次信息    返回一个节次开始和结束时间的列表
+l = (os.path.dirname(os.path.realpath(__file__)).split('/'))
+l.pop(-1)
+l.pop(-1)
+l.append('')
+base = '/'.join(l)
+
+
 class ReadIni():
 
     begin_time_list = [] # 设置一个列表存两节课的开始和结束时间
+
 
     def __init__(self):
         self.begin_time_list = self.read_begin(self.begin_time_list)
 
     def read_begin(self,class_time_list ):
         cf = ConfigParser.ConfigParser()
-        cf.read('./internal/settings.ini')
+        cf.read(base+'internal/settings.ini')
 
         time = re.split('-|:', cf.get('sectime', 'sec1'))
         time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
@@ -41,6 +50,20 @@ class ReadIni():
 
     def read_late_dev(self,):
         cf = ConfigParser.ConfigParser()
-        cf.read('./internal/settings.ini')
+        cf.read(base+'internal/settings.ini')
         return int(cf.get('latedev', 'latedev'))
 
+    @staticmethod
+    def read_path():
+        cf = ConfigParser.ConfigParser()
+        cf.read(base+'internal/settings.ini')
+        dic = {}
+        dic.update({'tea_path':base+cf.get('path', 'tea_path')})
+        dic.update({'crs_path': base+cf.get('path', 'crs_path')})
+        dic.update({'seq_path': base+cf.get('path', 'seq_path')})
+        dic.update({'files_path': base+cf.get('path', 'files_path')})
+        dic.update({'stu_path': base+cf.get('path', 'stu_path')})
+        return dic
+
+if __name__ == '__main__':
+    print base

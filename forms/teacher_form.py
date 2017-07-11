@@ -49,7 +49,7 @@ class ProgressForm(Form):
 
     def __init__(self):
         self.path = [MainForm.name, TeacherForm.name,self.name]
-        self.items = ['Attendance', 'Absence','Browse Detail Records','back']
+        self.items = ['Attendance', 'Absence','Real-time Detail Records','back']
         Form.__init__(self, self.path, self.items)
 
 if __name__ == '__main__':
