@@ -44,7 +44,6 @@ class Form():
                 if choice > int(len(self.items)) or choice < 1:
                     print 'wrong input, try again!'
                     count += 1
-                    return -1
                 else:
                     return choice
             except ValueError,e:

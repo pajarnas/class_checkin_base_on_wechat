@@ -33,6 +33,9 @@ class BaseCheckin(Subject):
         self.seq_id = BaseCheckin.init_seq_id(self.tea_id, self.crs_id)
         self.init_files()
 
+
+
+
     def attach(self, observer):
         self.observers.append(observer)
 
@@ -184,8 +187,6 @@ class BaseCheckin(Subject):
             for crs_rec in crs_list:
                 if (crs_rec['TeacherID'] == str(self.tea_id)) & (crs_rec['CourseID'] == str(self.crs_id)):
                     class_list.append(crs_rec['ClassNums'])
-            if class_list == []:
-                return None
             return class_list
 
     @staticmethod

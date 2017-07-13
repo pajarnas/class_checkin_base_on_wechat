@@ -27,80 +27,82 @@ def main_menu():
 
 def tea_menu():
     subprocess.call("clear")
+    wechat_id = raw_input(PrtInfo.promptMessage(0))
     while True:
         m = TeacherForm()
         c = m.init_form()
         if c == 1:
-            start_menu()
+            start_menu(wechat_id)
         if c == 2:
-            update_menu()
+            update_menu(wechat_id)
         if c == 3:
-            history_menu()
+            history_menu(wechat_id)
         if c == 4:
-            progress_menu()
+            progress_menu(wechat_id)
         if c == 5:
             subprocess.call("clear")
             break
 
 
-def start_menu():
+def start_menu(wechat_id):
     subprocess.call("clear")
     while True:
         m = StartForm()
         c = m.init_form()
         if c == 1:
-            start_checkin_menu()
+            start_checkin_menu(wechat_id)
         if c == 2:
-            start_manual_menu()
+            start_manual_menu(wechat_id)
             pass
         if c == 3:
-            start_random_menu()
+            start_random_menu(wechat_id)
         if c == 4:
             subprocess.call("clear")
             break
 
 
-
-def update_menu():
+def update_menu(wechat_id):
     subprocess.call("clear")
     while True:
         m = UpdateForm()
         c = m.init_form()
         if c == 1:
-            update_once_checkin()
+            update_once_checkin(wechat_id)
             pass
         if c == 2:
             subprocess.call("clear")
             break
 
 
-def progress_menu():
+def progress_menu(wechat_id):
     subprocess.call("clear")
     while True:
         m = ProgressForm()
         c = m.init_form()
         if c == 1:
-            attendence()
+            attendence(wechat_id)
         if c == 2:
-            absence()
+            absence(wechat_id)
         if c == 3:
-            detail_now()
+            detail_now(wechat_id)
         if c == 4:
+            check_list_now(wechat_id)
+        if c == 5:
             subprocess.call("clear")
             break
 
 
-def history_menu():
+def history_menu(wechat_id):
     subprocess.call("clear")
     while True:
         m = HistoryForm()
         c = m.init_form()
         if c == 1:
-            sum_history()
+            sum_history(wechat_id)
         if c == 2:
-            detail_history()
+            detail_history(wechat_id)
         if c == 3:
-            checkin_history()
+            checkin_history(wechat_id)
         if c == 4:
             subprocess.call("clear")
             break
@@ -108,20 +110,20 @@ def history_menu():
 
 def stu_menu():
     subprocess.call("clear")
+    wechat_id = raw_input(PrtInfo.promptMessage(0))
     while True:
         m = StudentForm()
         c = m.init_form()
         if c == 1:
-            join_checkin_menu()
+            join_checkin_menu(wechat_id)
         if c == 2:
             subprocess.call("clear")
             break
 
 
-def join_checkin_menu():
+def join_checkin_menu(wechat_id):
     subprocess.call("clear")
     while True:
-       wechat_id = raw_input(PrtInfo.promptMessage(0))
        t =  BaseCheckin.find_checkin_obj_with_wechat_id(wechat_id)
        if t != None:
            if t.get_random_list() != []:
@@ -134,10 +136,13 @@ def join_checkin_menu():
            break
 
 
-def start_checkin_menu():
+def start_checkin_menu(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
+        obj = BaseCheckin.find_checkin_obj_for_tea(wechat_id)
+        if obj != None:
+            print PrtInfo.failedMessage(7)
+            break
         obj = AutoCheckin(wechat_id)
         if obj == None:
             print PrtInfo.failedMessage(4)
@@ -149,10 +154,9 @@ def start_checkin_menu():
             break
 
 
-def start_manual_menu():
+def start_manual_menu(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -166,10 +170,9 @@ def start_manual_menu():
             break
 
 
-def start_random_menu():
+def start_random_menu(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = BaseCheckin.find_checkin_obj_for_tea(wechat_id)
         if obj == None:
             print PrtInfo.failedMessage(4)
@@ -186,10 +189,9 @@ def start_random_menu():
                 print 'invalid input ,try again'
 
 
-def update_once_checkin():
+def update_once_checkin(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj =ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -197,21 +199,22 @@ def update_once_checkin():
             if prompt == 'n':
                 break
         else:
-            stu_id = raw_input(PrtInfo.promptMessage(3))
             r = range(1, obj.init_seq_id(obj.tea_id, obj.crs_id))
             r.append('exit')
             c = Form(['seq id'], r)
             seq_id = c.init_form()
             if seq_id == len(r) or seq_id == -1:
                 break
+            detail_records = DetailFile.read_file(BaseCheckin.init_detail_name(obj.tea_id, obj.crs_id, seq_id))
+            detail_format(detail_records)
+            stu_id = raw_input(PrtInfo.promptMessage(3))
             obj.update_stu_detail_checkin_result(stu_id, seq_id,obj.tea_id,obj.crs_id)
             break
 
 
-def sum_history():
+def sum_history(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -239,10 +242,9 @@ def sum_history():
             break
 
 
-def detail_history():
+def detail_history(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -261,10 +263,10 @@ def detail_history():
             break
 
 
-def checkin_history():
+def checkin_history(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
+
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -284,10 +286,9 @@ def checkin_history():
             break
 
 
-def attendence():
+def attendence(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -309,10 +310,9 @@ def attendence():
                 break
 
 
-def absence():
+def absence(wechat_id):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -334,10 +334,9 @@ def absence():
                 break
 
 
-def detail_now():
+def detail_now(wechat_id ):
     subprocess.call("clear")
     while True:
-        wechat_id = raw_input(PrtInfo.promptMessage(0))
         obj = ManCheckin(wechat_id)
         if obj.tea_id == 0:
             print PrtInfo.failedMessage(4)
@@ -353,6 +352,11 @@ def detail_now():
             else:
                 break
 
+def check_list_now(wechat_id):
+        k = 1
+        for i in BaseCheckin.checkin_list:
+            print 'No.{}-->check in obj{}'.format(k,(i.init_detail_name(i.tea_id,i.crs_id,i.seq_id)).split('/')[-1])
+            k += 1
 
 if __name__ == '__main__':
     main_menu()

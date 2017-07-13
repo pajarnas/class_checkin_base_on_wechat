@@ -20,10 +20,11 @@ class ManCheckin (BaseCheckin):
                         detail_rec['checkinResult'] = '请假'
                     else:
                         detail_rec['checkinResult'] = '缺勤'
+                detail_rec['IsSuc'] = 'True'
                 detail_rec['checkinResult'] = raw_input(PrtInfo.promptMessage(4))
                 print PrtInfo.successMessage(0)+detail_rec['checkinResult']
                 detail_file = DetailFile(BaseCheckin.init_detail_name(tea_id, crs_id, seq_id))
-                detail_file.write_file(detail_records)
+                detail_file.write_file([detail_rec],'ab')
                 return True
         print PrtInfo.notFoundMessage(3)
         return False
@@ -40,8 +41,8 @@ class ManCheckin (BaseCheckin):
             for line in leave_list:
                 print 'Name:' + BaseCheckin.get_student_name(obj,line['StuID'])
                 print 'Image:' + line['ProofPath']
-                if raw_input(PrtInfo.promptMessage(8)) == 'y':
-
+                choice = raw_input(PrtInfo.promptMessage(8))
+                if choice == 'y':
                     print line['ProofPath']
                     line['checkinResult'] = '请假'
                 else:

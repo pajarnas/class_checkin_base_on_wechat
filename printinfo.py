@@ -85,6 +85,8 @@ class PrtInfo():
             return 'Wrong (5):'+ 'Wrong wechat id or no such check in obj'
         if id == 6:
             return 'Wrong (6):'+ 'please start check in first'
+        if id == 7:
+            return 'Wrong (7):'+ 'you have already launched a check in'
 
     @staticmethod
     def tipsMessage(id):

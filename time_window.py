@@ -9,7 +9,6 @@ class TimeWindow:
 
     def __init__(self):
         self.t = None
-
         pass
 
     def just_waiting(self):
@@ -53,6 +52,6 @@ if __name__ == '__main__':
     print dev('19:40','20:03')
     print dev('19:40', '20:37')
     print dev('19:40', '21:47')
-    print  dev('19:40', '22:17')
+    print dev('19:40', '22:17')
 
 

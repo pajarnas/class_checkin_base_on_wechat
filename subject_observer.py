@@ -41,7 +41,7 @@ class TimeWindowObserver(Observer):
         # 只处理非正常结束计时器的考勤对象
         if isinstance(self.checkin_obj.time_window.t, threading._Timer) :
              self.checkin_obj.time_window.t.cancel()
-             print 'cancel time :' + time.strftime('%H:%M:%S') +'__' +self.checkin_obj.tea_id
+             print 'cancel time :' + time.strftime('%H:%M:%S') +'__' +str(self.checkin_obj.tea_id)
          
 
 class EndcheckinObserver(Observer):
@@ -50,7 +50,7 @@ class EndcheckinObserver(Observer):
         self.checkin_obj = checkin_obj
 
     def update(self):
-        print 'end checkin_files time :'+ time.strftime('%H:%M:%S') +'__' +self.checkin_obj.tea_id
+        print 'end checkin_files time :'+ time.strftime('%H:%M:%S') +'__' +str(self.checkin_obj.tea_id)
         self.checkin_obj.end_checkin()
 
 

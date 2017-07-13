@@ -15,13 +15,25 @@ class AutoCheckin(BaseCheckin):
         BaseCheckin.__init__(self, wechat_id)
         self.class_list = self.init_class_records()
         self.enter_time = time.strftime('%H:%M')
-        self.section_id = self.init_section_id(time.strftime('%H:%M'))
+        self.section_id = self.init_section_id(self.enter_time)
         self.time_window = TimeWindow()
+
+    def __str__(self):
+        dic = {}
+        dic['index'] = str(BaseCheckin.checkin_list.index(self))
+        dic['tea_id'] = self.tea_id
+        dic['crs_id'] = self.crs_id
+        dic['seq_id'] = self.seq_id
+        dic['wechat_id'] = self.wechat_id
+        dic['class_list'] = self.class_list
+        dic['enter_time'] = self.enter_time
+        dic['section_time'] = self.section_id
+        dic['time_window'] = self.time_window
 
     def init_section_id(self, nowtime):
         t = ReadIni()
         nowtime = int(''.join(nowtime.split(':')))
-        for i in range(0, 5, 1):
+        for i in range(0, 6, 1):
             e = int(''.join(t.begin_time_list[i]['EndTime'].split(':')))
             s = int(''.join(t.begin_time_list[i]['StartTime'].split(':')))
             if (nowtime >= s) & (nowtime <= e):
@@ -46,15 +58,13 @@ class AutoCheckin(BaseCheckin):
 
     def entry_list(self):
         # self.enter_time = '8:30'
-        self.section_id = self.init_section_id(self.enter_time)
         class_list = self.init_class_records()
         intersection_flag = False
-
         # 全局队列为空:
         if BaseCheckin.checkin_list == []:
-            # print PrtInfo.successMessage(7)
+            print PrtInfo.successMessage(7)
             BaseCheckin.checkin_list.append(self)
-            self.time_window.start_timing(300)
+            self.time_window.start_timing()
             return True
         # 非空
         kick_head = False
@@ -77,12 +87,12 @@ class AutoCheckin(BaseCheckin):
                 print 'invalid operation'
                 return False
         # 队列中的所有班都与来者没有交集,或者有交集被踢出去
-        if (intersection_flag is False) | (kick_head is False):
+        if (intersection_flag == False) | (kick_head == False):
             # 没有交集 或者 踢掉的不是队首
             self.time_window.just_waiting()
             BaseCheckin.checkin_list.append(self)
-        elif (intersection_flag is True) & (kick_head is True) & \
-                (BaseCheckin.checkin_list.__len__() is not 0):
+        elif (intersection_flag == True) & (kick_head == True) & \
+                (BaseCheckin.checkin_list.__len__() != 0):
             # 有交集 且 踢掉的是队首 且 当前者不是队首
             print PrtInfo.successMessage(7)
             BaseCheckin.checkin_list.append(self)
@@ -91,7 +101,7 @@ class AutoCheckin(BaseCheckin):
             self.time_window.time_second(t2, t3)
         else:
             # 有交集 且 踢掉队首 且 自己是队首
-            print PrtInfo.successMessage(7)
+            print PrtInfo.successMessage(6)
             BaseCheckin.checkin_list.append(self)
             self.time_window.start_timing()
 
@@ -297,5 +307,12 @@ class AutoCheckin(BaseCheckin):
 
 if __name__ == '__main__':
     c = AutoCheckin('w_101')
-    c.seq_id = 14
-    c.end_checkin()
+    c.enter_time = '18:20'
+    c.entry_list()
+    print c.init_section_id(c.enter_time)
+    print c.section_id
+    time.sleep(2)
+    d = AutoCheckin('w_102')
+    d.enter_time = '19:20'
+    d.section_id = 6
+    d.entry_list()

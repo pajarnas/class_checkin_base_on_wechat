@@ -46,6 +46,11 @@ class ReadIni():
         time_dict = {'StartTime': str(time[0])+':' + str(time[1]),
                      'EndTime': str(time[2])+':' + str(time[3])}
         class_time_list.append(time_dict)
+        # 第四五节课的时间始末
+        time = re.split('-|:', cf.get('sectime', 'sec6'))
+        time_dict = {'StartTime': str(time[0]) + ':' + str(time[1]),
+                     'EndTime': str(time[2]) + ':' + str(time[3])}
+        class_time_list.append(time_dict)
         return class_time_list
 
     def read_late_dev(self,):
