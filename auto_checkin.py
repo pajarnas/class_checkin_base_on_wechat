@@ -33,7 +33,7 @@ class AutoCheckin(BaseCheckin):
     def init_section_id(self, nowtime):
         t = ReadIni()
         nowtime = int(''.join(nowtime.split(':')))
-        for i in range(0, 6, 1):
+        for i in range(0, 8):
             e = int(''.join(t.begin_time_list[i]['EndTime'].split(':')))
             s = int(''.join(t.begin_time_list[i]['StartTime'].split(':')))
             if (nowtime >= s) & (nowtime <= e):
@@ -247,7 +247,7 @@ class AutoCheckin(BaseCheckin):
     def get_compared_record(self, auto_rec, ran_rec, is_late):
         if auto_rec['IsSuc'] == ran_rec['IsSuc']:
             checkin_result = '出勤' if auto_rec['IsSuc'] == 'True' else '缺勤'
-            auto_rec.update({'checkinResult': checkin_result})
+            auto_rec['checkinResult'] = checkin_result
         else:
             t1 = ((auto_rec['checkinTime'].split(' '))[1])[0:5]
             t2 = ((ran_rec['checkinTime'].split(' '))[1])[0:5]
@@ -259,9 +259,9 @@ class AutoCheckin(BaseCheckin):
                     auto_rec.update({'checkinResult':'迟到'})
             else:
                 if auto_rec['IsSuc'] == 'True' and dev_time < 0:
-                    auto_rec.update({'checkinResult':'早退'})
-                else:
                     auto_rec.update({'checkinResult':'出勤'})
+                else:
+                    auto_rec.update({'checkinResult':'早退'})
         return auto_rec
 
     def exit_checkin(self):
@@ -306,13 +306,7 @@ class AutoCheckin(BaseCheckin):
 
 
 if __name__ == '__main__':
-    c = AutoCheckin('w_101')
-    c.enter_time = '18:20'
-    c.entry_list()
-    print c.init_section_id(c.enter_time)
-    print c.section_id
-    time.sleep(2)
-    d = AutoCheckin('w_102')
-    d.enter_time = '19:20'
-    d.section_id = 6
-    d.entry_list()
+    c = AutoCheckin('w_103')
+    c.enter_time = '04:10'
+    c.seq_id = 4
+    c.end_checkin()

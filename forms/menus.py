@@ -322,12 +322,17 @@ def absence(wechat_id):
         else:
             c = BaseCheckin.find_checkin_obj_for_tea(wechat_id)
             if c != None:
-                detail_records = BaseFile.read_file(c.init_detail_name(str(c.tea_id),str(c.crs_id),str(c.seq_id)))
-                detail_records = BaseCheckin.filter_invalid_detail_records(detail_records)
                 temp = []
-                for i in detail_records:
-                    if i['IsSuc'] == 'False':
-                        temp.append(i)
+                for stu in c.init_student_records():
+                    auto_rec = c.get_latest_record(stu['StuID'], 'Auto')
+                    if auto_rec == {} or auto_rec['IsSuc'] == 'False':
+                            auto_rec = {'StuID': stu['StuID'],
+                                        'checkinTime': '?????????????????????',
+                                        'ProofPath': 'none',
+                                        'checkinType': 'Auto',
+                                        'IsSuc': 'False',
+                                        'checkinResult': '???'}
+                            temp.append(auto_rec)
                 print detail_format(temp)
                 break
             else:
@@ -355,7 +360,7 @@ def detail_now(wechat_id ):
 def check_list_now(wechat_id):
         k = 1
         for i in BaseCheckin.checkin_list:
-            print 'No.{}-->check in obj{}'.format(k,(i.init_detail_name(i.tea_id,i.crs_id,i.seq_id)).split('/')[-1])
+            print 'No.{}-->check in obj {} sec Id:{}'.format(k,(i.init_detail_name(i.tea_id,i.crs_id,i.seq_id)).split('/')[-1],i.init_section_id(i.enter_time))
             k += 1
 
 if __name__ == '__main__':

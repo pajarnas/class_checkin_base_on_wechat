@@ -1,0 +1,12 @@
+StuID,checkinTime,ProofPath,checkinType,IsSuc,checkinResult
+201416920508,2017-07-15 03:22:01,awjiod,Auto,True,
+201416920508,2017-07-15 03:22:01,awjiod,Auto,True,出勤
+201416920509,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416920510,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416920511,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416920512,2017-07-15 03:36:04,none,Auto,False,缺勤
+201413040325,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416070325,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416920616,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416920618,2017-07-15 03:36:04,none,Auto,False,缺勤
+201416920619,2017-07-15 03:36:04,none,Auto,False,缺勤

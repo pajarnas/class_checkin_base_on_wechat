@@ -51,6 +51,16 @@ class ReadIni():
         time_dict = {'StartTime': str(time[0]) + ':' + str(time[1]),
                      'EndTime': str(time[2]) + ':' + str(time[3])}
         class_time_list.append(time_dict)
+
+        time = re.split('-|:', cf.get('sectime', 'sec7'))
+        time_dict = {'StartTime': str(time[0]) + ':' + str(time[1]),
+                     'EndTime': str(time[2]) + ':' + str(time[3])}
+        class_time_list.append(time_dict)
+
+        time = re.split('-|:', cf.get('sectime', 'sec8'))
+        time_dict = {'StartTime': str(time[0]) + ':' + str(time[1]),
+                     'EndTime': str(time[2]) + ':' + str(time[3])}
+        class_time_list.append(time_dict)
         return class_time_list
 
     def read_late_dev(self,):
@@ -71,4 +81,15 @@ class ReadIni():
         return dic
 
 if __name__ == '__main__':
-    print base
+    t = ReadIni()
+    nowtime = '02:15'
+    nowtime = int(''.join(nowtime.split(':')))
+    for i in range(0, 8):
+        e = int(''.join(t.begin_time_list[i]['EndTime'].split(':')))
+        s = int(''.join(t.begin_time_list[i]['StartTime'].split(':')))
+        print e
+        print s
+        if (nowtime >= s) & (nowtime <= e):
+            print i + 1
+    else:
+        print 0

@@ -9,7 +9,6 @@ class TimeWindow:
 
     def __init__(self):
         self.t = None
-        pass
 
     def just_waiting(self):
         # do noting
@@ -27,15 +26,15 @@ class TimeWindow:
             t2 = BaseCheckin.checkin_list[0].enter_time
             # dev = ((int(t2) - int(t1)) % 100) + ((int(t2) - int(t1)) / 100) * 60
             dev = self.dev(t1,t2)
-            self.start_timing(dev)
+            self.start_timing(dev*60)
         else:
             PrtInfo.tipsMessage(0)
 
     def time_second(self,t2, t3):
-        dev = int(100) - self.dev(t2, t3)
-        self.start_timing(dev)
+        dev = int(15) - self.dev(t2, t3)
+        self.start_timing(dev * 60)
 
-    def start_timing(self, dev=6000):
+    def start_timing(self, dev=900):
         self.t = threading.Timer(dev, self.time_next)
 
         self.t.start()
